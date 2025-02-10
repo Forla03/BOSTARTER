@@ -1,11 +1,39 @@
 ﻿<!DOCTYPE html>
-
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="it">
 <head>
-    <meta charset="utf-8" />
-    <title>BOSTARTER - Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BOSTARTER</title>
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
-    <a href= "../register/register.html">Non hai ancora un account? Clicca qui!</a>
+
+    <div class="login-container">
+        <h2>Accedi a BOSTARTER</h2>
+        <form id="loginForm" action="../../Backend/login.php" method="POST">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <!-- Campo nascosto per codice di sicurezza amministratore -->
+            <div id="adminFields" class="administratorLogin">
+                <label for="security">Codice di sicurezza</label>
+                <input type="number" id="securityCode" name="securityCode">
+            </div>
+
+            <button type="submit">Accedi</button>
+        </form>
+
+        <!-- Link per attivare il login da amministratore -->
+        <p><a href="#" id="toggleAdmin">Accedi come amministratore</a></p>
+
+        <p>Non hai un account? <a href="../register/register.html">Registrati qui</a></p>
+    </div>
+
+    <script src="login.js"></script>
+
 </body>
 </html>
+
