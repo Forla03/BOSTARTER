@@ -1,0 +1,105 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #007bff;
+    color: white;
+    padding: 15px 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    padding: 0;
+}
+
+    nav ul li {
+        display: inline;
+    }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+#loginBtn {
+    background: white;
+    color: #007bff;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+}
+
+.hero {
+    text-align: center;
+    padding: 50px 20px;
+    background: #0056b3;
+    color: white;
+}
+
+.cta {
+    background: white;
+    color: #0056b3;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.categories, .projects {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.category-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.category {
+    background: #007bff;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.project-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.project {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+    .project img {
+        width: 100%;
+        max-width: 200px;
+        border-radius: 5px;
+    }
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #007bff;
+    color: white;
+}

@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOSTARTER - Crowdfunding</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+    <script>
+     // Effettua una richiesta AJAX per verificare la connessione
+     fetch("/Backend/config.php")
+     .then(response => response.text())
+     .then(data => {
+         console.log("Connessione al DB effettuata.");
+     })
+     .catch(error => {
+          console.log("Errore nella richiesta.");
+     });
+    </script>
+
+    <header>
+        <div class="logo">BOSTARTER</div>
+        <nav>
+            <ul>
+                <li><a href="#">Progetti</a></li>
+                <li><a href="#">Categorie</a></li>
+                <li><a href="#">Chi siamo</a></li>
+                <li><a href="#">Contatti</a></li>
+            </ul>
+        </nav>
+        <button id="loginBtn">Accedi</button>
+    </header>
+
+    <section class="hero">
+        <h1>Finanzia e scopri progetti innovativi</h1>
+        <p>Unisciti alla community e supporta lo sviluppo di idee rivoluzionarie.</p>
+        <button class="cta">Esplora i progetti</button>
+    </section>
+
+    <section class="categories">
+        <h2>Scopri le categorie</h2>
+        <div class="category-list">
+            <div class="category">Progetti Hardware</div>
+            <div class="category">Progetti Software</div>
+        </div>
+    </section>
+
+    <section class="projects">
+        <h2>Progetti in evidenza</h2>
+        <div class="project-list">
+            <div class="project">
+                <img src="hardware.jpg" alt="Progetto Hardware">
+                <h3>Dispositivo IoT innovativo</h3>
+                <p>Un device smart per la casa con funzioni avanzate.</p>
+            </div>
+            <div class="project">
+                <img src="software.jpg" alt="Progetto Software">
+                <h3>App gestionale avanzata</h3>
+                <p>Un'app potente per organizzare il tuo lavoro.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 BOSTARTER - Tutti i diritti riservati</p>
+    </footer>
+
+    <script src="home.js"></script>
+</body>
+</html>
+
+
