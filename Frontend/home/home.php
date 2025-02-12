@@ -1,4 +1,4 @@
-﻿<?php session_start(); ?>
+<?php session_start(); ?>
 
 <!DOCTYPE html>
 <html lang="it">
@@ -25,7 +25,9 @@
         <div class="logo">BOSTARTER</div>
         <nav>
             <ul>
-                <li><a href="#">Progetti</a></li>
+                <li>
+                 <a href="<?php echo isset($_SESSION['email']) ? '../creator/creator.html' : '../login/login.html'; ?>">Enrollement</a>
+                </li>
                 <li><a href="#">Categorie</a></li>
                 <li><a href="../skills/skills.php">Skills</a></li>
                 <li><a href="#">Contatti</a></li>
@@ -37,7 +39,7 @@
     <section class="hero">
         <h1>Finanzia e scopri progetti innovativi</h1>
         <p>Unisciti alla community e supporta lo sviluppo di idee rivoluzionarie.</p>
-        <button class="cta">Esplora i progetti</button>
+        <button class="cta" onclick="window.location.href= '../projects/progetti.php'">Esplora i progetti</button>
     </section>
 
     <section class="categories">

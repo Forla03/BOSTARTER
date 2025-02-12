@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($utente && password_verify($password, $utente["password"])) {
             $_SESSION["email"] = $utente["email"];
             $_SESSION["nickname"] = $utente["nickname"];
-            header("Location: ../Frontend/home/home.html"); // Reindirizza alla home
+            header("Location: ../Frontend/home/home.php"); // Reindirizza alla home
             exit();
         } else {
             echo "Email o password errati.";

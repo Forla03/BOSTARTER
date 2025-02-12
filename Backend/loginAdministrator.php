@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION["email"] = $utente["email"];
                     $_SESSION["nickname"] = $utente["nickname"];
                     $_SESSION["is_admin"] = true; // Salva il ruolo
-                    header("Location: ../Frontend/home/home.html"); // Reindirizza alla home
+                    header("Location: ../Frontend/home/home.php"); // Reindirizza alla home
                     exit();
                 } else {
                     echo "Codice di sicurezza errato.";

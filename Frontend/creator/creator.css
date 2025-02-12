@@ -1,0 +1,69 @@
+﻿
+/* Stile generale della pagina */
+body {
+    font: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Contenitore principale */
+.container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+/* Titolo */
+h2 {
+    color: #0044cc;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+/* Testo di benvenuto */
+p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Pulsanti */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Stile per il pulsante di richiesta */
+.request-btn {
+    background: #0044cc;
+    color: white;
+}
+
+    .request-btn:hover {
+        background: #0033a0;
+    }
+
+/* Stile per il pulsante di gestione progetti */
+.manage-btn {
+    background: #009688;
+    color: white;
+}
+
+    .manage-btn:hover {
+        background: #00796b;
+    }
