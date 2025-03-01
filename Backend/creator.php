@@ -3,21 +3,27 @@ session_start();
 require 'config.php'; // Connessione al database
 
 $email = $_SESSION['email'];
+$is_creator = $_SESSION['is_creator'];
 
-// Controlla se l'utente è un creatore
-$sql = "SELECT * FROM Creatore WHERE email_utente = :email";
-$stmt = $conn->prepare($sql);
-$stmt->bindParam(":email", $email);
-$stmt->execute();  
-$creatore = $stmt->fetch();
+if ($is_creator) {
+    // Recupera i dati aggiuntivi del creator
+    $sql = "SELECT nr_progetti, affidabilita FROM Creatore WHERE email_utente = :email";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
+    $creatorData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($creatore) {
-    // Se l'utente è un creatore, mostra il menu di creazione
-    $response = [
-        'status' => 'creator',
-        'nr_progetti' => $creatore['nr_progetti'],
-        'affidabilita' => $creatore['affidabilita']
-    ];
+    if ($creatorData) {
+        // Se l'utente è un creatore, restituisci i suoi dati
+        $response = [
+            'status' => 'creator',
+            'nr_progetti' => $creatorData['nr_progetti'],
+            'affidabilita' => $creatorData['affidabilita']
+        ];
+    } else {
+        // In caso di errore nel recupero dei dati, trattalo come non creator
+        $response = ['status' => 'not_creator'];
+    }
 } else {
     // Se l'utente non è un creatore, mostra il modulo di richiesta
     $response = ['status' => 'not_creator'];
@@ -26,4 +32,5 @@ if ($creatore) {
 header('Content-Type: application/json');
 echo json_encode($response);
 ?>
+
 
