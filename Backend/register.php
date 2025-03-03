@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":luogo_nascita", $luogo_nascita);
         $stmt->execute();
 
-        header('Location: ../../Frontend/login/login.html');
+        header('Location: Frontend/login/login.html');
         exit();
     } catch (PDOException $e) {
         echo "Errore nella registrazione: " . $e->getMessage();

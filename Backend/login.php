@@ -17,17 +17,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["email"] = $utente["email"];
             $_SESSION["nickname"] = $utente["nickname"];
 
-            // Controlla se l'utente è un creator
+            // Controlla se l'utente ï¿½ un creator
             $sql = "SELECT * FROM Creatore WHERE email_utente = :email";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(":email", $email);
             $stmt->execute();
             $creatore = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Se esiste nella tabella Creatore, è un creator
+            // Se esiste nella tabella Creatore, ï¿½ un creator
             $_SESSION["is_creator"] = $creatore ? true : false;
 
-            header("Location: ../Frontend/home/home.php"); // Reindirizza alla home
+            header("Location: /index.php"); // Reindirizza alla home
             exit();
         } else {
             echo "Email o password errati.";

@@ -26,10 +26,10 @@
         <nav>
             <ul>
                 <li>
-                 <a href="<?php echo isset($_SESSION['email']) ? '../creator/creator.html' : '../login/login.html'; ?>">Enrollement</a>
+                 <a href="<?php echo isset($_SESSION['email']) ? 'Frontend/creator/creator.html' : 'Frontend/login/login.html'; ?>">Enrollement</a>
                 </li>
                 <li><a href="#">Categorie</a></li>
-                <li><a href="../skills/skills.php">Skills</a></li>
+                <li><a href="Frontend/skills/skills.php">Skills</a></li>
                 <li><a href="#">Contatti</a></li>
             </ul>
         </nav>
@@ -39,7 +39,7 @@
     <section class="hero">
         <h1>Finanzia e scopri progetti innovativi</h1>
         <p>Unisciti alla community e supporta lo sviluppo di idee rivoluzionarie.</p>
-        <button class="cta" onclick="window.location.href= '../projects/progetti.php'">Esplora i progetti</button>
+        <button class="cta" onclick="window.location.href= 'Frontend/projects/progetti.php'">Esplora i progetti</button>
     </section>
 
     <section class="categories">

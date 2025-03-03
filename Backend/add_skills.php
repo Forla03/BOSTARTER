@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":skill_level", $skill_level);
         $stmt->execute();
 
-        header('Location: ../../Frontend/skills/add_skill.html');
+        header('Location: Frontend/skills/add_skill.html');
 
         }
     catch (PDOException $e) {

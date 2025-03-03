@@ -27,17 +27,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION["nickname"] = $utente["nickname"];
                     $_SESSION["is_admin"] = true; // Salva il ruolo di amministratore
 
-                    // Controlla se l'utente è un creator
+                    // Controlla se l'utente ï¿½ un creator
                     $sql = "SELECT * FROM Creatore WHERE email_utente = :email";
                     $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":email", $email);
                     $stmt->execute();
                     $creatore = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Se esiste nella tabella Creatore, è un creator
+                    // Se esiste nella tabella Creatore, ï¿½ un creator
                     $_SESSION["is_creator"] = $creatore ? true : false;
 
-                    header("Location: ../Frontend/home/home.php"); // Reindirizza alla home
+                    header("Location: /index.php"); // Reindirizza alla home
                     exit();
                 } else {
                     echo "Codice di sicurezza errato.";
@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "Password errata.";
             }
         } else {
-            echo "Email non trovata o non è un amministratore.";
+            echo "Email non trovata o non ï¿½ un amministratore.";
         }
     } catch (PDOException $e) {
         echo "Errore nel login: " . $e->getMessage();
