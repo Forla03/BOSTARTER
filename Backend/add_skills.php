@@ -15,9 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":skill_level", $skill_level);
         $stmt->execute();
 
-        header('Location: Frontend/skills/add_skill.html');
-
-        }
+        // Reindirizza alla pagina dopo aver inserito la skill
+        header('Location: ../Frontend/skills/add_skill.html');
+    }
     catch (PDOException $e) {
         echo "Errore nell'inserimento: " . $e->getMessage();
     }

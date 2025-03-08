@@ -116,11 +116,12 @@ CREATE TABLE Componente (
 CREATE TABLE ProgettoComponente (
     nome_progetto VARCHAR(255),
     nome_componente VARCHAR(100),
-    quantita INT CHECK (quantita > 0) NOT NULL,
+    quantita INT NOT NULL CHECK (quantita > 0),
     PRIMARY KEY (nome_progetto, nome_componente),
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoHardware(nome_progetto) ON DELETE CASCADE,
     FOREIGN KEY (nome_componente) REFERENCES Componente(nome)
 );
+
 
 CREATE TABLE ProgettoSoftware (
     nome_progetto VARCHAR(255) PRIMARY KEY,
@@ -232,7 +233,7 @@ CREATE PROCEDURE FinanziaProgetto(
 BEGIN
     DECLARE progetto_stato ENUM('aperto', 'chiuso');
 
-    -- Controlla se il progetto è aperto
+    -- Controlla se il progetto ï¿½ aperto
     SELECT stato INTO progetto_stato FROM Progetto WHERE nome = p_nome_progetto;
 
     IF progetto_stato = 'aperto' THEN
@@ -241,7 +242,7 @@ BEGIN
         VALUES (p_email_utente, p_nome_progetto, p_importo, p_data, p_codice_reward);
     ELSE
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Il progetto è chiuso e non può essere finanziato.';
+        SET MESSAGE_TEXT = 'Il progetto ï¿½ chiuso e non puï¿½ essere finanziato.';
     END IF;
 END $$
 
@@ -315,7 +316,7 @@ BEGIN
     FROM ProgettoSoftware
     WHERE nome_progetto = p_nome_progetto;
 
-    -- Controlla se il profilo è richiesto per il progetto
+    -- Controlla se il profilo ï¿½ richiesto per il progetto
     SELECT COUNT(*) INTO profilo_esiste
     FROM ProfiliElenco
     WHERE nome_progetto = p_nome_progetto AND nome_profilo = p_nome_profilo;
@@ -360,5 +361,29 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nessuna richiesta trovata per questa email';
     END IF;
 END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE AggiungiAmministratore(
+    IN p_email VARCHAR(255),
+    IN p_codice_sicurezza CHAR(5)
+)
+BEGIN
+    -- Controlla se l'utente esiste
+    IF EXISTS (SELECT 1 FROM Utente WHERE email = p_email) THEN
+        -- Controlla se l'utente Ã¨ giÃ  un amministratore
+        IF NOT EXISTS (SELECT 1 FROM Amministratore WHERE email_utente = p_email) THEN
+            -- Inserisce l'utente come amministratore
+            INSERT INTO Amministratore (email_utente, codice_sicurezza)
+            VALUES (p_email, p_codice_sicurezza);
+        ELSE
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utente Ã¨ giÃ  un amministratore';
+        END IF;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utente non esiste';
+    END IF;
+END $$
 
 DELIMITER ;

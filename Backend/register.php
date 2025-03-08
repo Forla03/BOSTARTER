@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // Query per inserire l'utente
-        $stmt = $conn->prepare("INSERT INTO UTENTE (email, nickname, password, nome, cognome, anno_nascita, luogo_nascita) 
+        $stmt = $conn->prepare("INSERT INTO Utente (email, nickname, password, nome, cognome, anno_nascita, luogo_nascita) 
                                 VALUES (:email, :nickname, :password, :nome, :cognome, :anno_nascita, :luogo_nascita)");
         $stmt->bindParam(":email", $email);
         $stmt->bindParam(":nickname", $nickname);
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":luogo_nascita", $luogo_nascita);
         $stmt->execute();
 
-        header('Location: Frontend/login/login.html');
+        header('Location: ../Frontend/login/login.html');
         exit();
     } catch (PDOException $e) {
         echo "Errore nella registrazione: " . $e->getMessage();

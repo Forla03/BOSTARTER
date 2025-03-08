@@ -1,6 +1,11 @@
-﻿<?php
+<?php 
 session_start();
 require '../../Backend/config.php';
+
+// Controlla se la connessione è valida
+if (!$conn) {
+    die("Errore di connessione al database.");
+}
 ?>
 
 <!DOCTYPE html>
@@ -17,6 +22,9 @@ require '../../Backend/config.php';
     <h1>Competenze di Programmazione</h1>
 </header>
 
+<a href="../../index.php">Home</a>
+
+  
 <section class="skills-container">
     <ul id="skills-list">
         <?php
@@ -48,7 +56,7 @@ require '../../Backend/config.php';
                     }
                 } else {
                     // Se non è loggato, reindirizza al login
-                    echo " <button class='login-btn' onclick=\"window.location.href='../login/login.html'\">Accedi per aggiungere</button>";
+                    echo " <button class='login-btn' onclick=\"window.location.href='../../Frontend/login/login.html'\">Accedi per aggiungere</button>";
                 }
 
                 echo "</li>";
@@ -61,26 +69,26 @@ require '../../Backend/config.php';
 
     <?php
     if (isset($_SESSION["is_admin"]) && $_SESSION["is_admin"] === true) {
-        echo '<a href="add_skill.php" class="add-skill-btn">Aggiungi Skill</a>';
+        echo '<a href="add_skill.html" class="add-skill-btn">Aggiungi Skill</a>';
     }
     ?>
 </section>
 
 <script>
 function addSkill(skill, level) {
-    fetch('../../Backend/add_skillsToCurriculum.php', {
+    fetch('../../Backend/add_skillsToCurriculum.php', {  
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'skill=' + encodeURIComponent(skill) + '&level=' + encodeURIComponent(level)
     })
     .then(response => response.text())
     .then(data => {
+        console.log("Risposta dal server:", data);
         alert(data);
-        location.reload(); // Ricarica la pagina per aggiornare il pulsante
+        setTimeout(() => location.reload(), 500);
     })
     .catch(error => console.error('Errore:', error));
 }
-
 function removeSkill(skill, level) {
     fetch('../../Backend/remove_skillsFromCurriculum.php', {
         method: 'POST',
@@ -90,7 +98,7 @@ function removeSkill(skill, level) {
     .then(response => response.text())
     .then(data => {
         alert(data);
-        location.reload(); // Ricarica la pagina per aggiornare il pulsante
+        setTimeout(() => location.reload(), 500); // Aspetta mezzo secondo prima di ricaricare
     })
     .catch(error => console.error('Errore:', error));
 }
@@ -98,6 +106,3 @@ function removeSkill(skill, level) {
 
 </body>
 </html>
-
-
-
