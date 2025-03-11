@@ -8,7 +8,7 @@
 </head>
 <body>
 
-     <div class="register-container">
+    <div class="register-container">
         <h2>Registrati su BOSTARTER</h2>
         <form id="registerForm" action="../../Backend/register.php" method="POST">
             <label for="email">Email</label>
@@ -35,13 +35,18 @@
             <label for="luogo_nascita">Luogo di nascita</label>
             <input type="text" id="luogo_nascita" name="luogo_nascita" required>
 
+            <label for="creator">Iscriviti come Creator</label>
+            <input type="checkbox" id="creator" name="creator" value="creator">
+            
+        
+
             <button type="submit">Registrati</button>
         </form>
 
         <p>Hai già un account? <a href="../Frontend/login/login.html">Accedi qui</a></p>
     </div>
 
+   
     <script src="register.js"></script>
-
 </body>
 </html>

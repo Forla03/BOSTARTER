@@ -36,14 +36,10 @@ CREATE TABLE Amministratore (
 CREATE TABLE Creatore (
     email_utente VARCHAR(255) PRIMARY KEY,
     nr_progetti INT DEFAULT 0,
-    affidabilita INT CHECK (affidabilita >= 0),
+    affidabilita INT DEFAULT 0 CHECK (affidabilita >= 0),
     FOREIGN KEY (email_utente) REFERENCES Utente(email)
 );
 
-CREATE TABLE Creatore_enrollement(
-    email_utente VARCHAR(255) PRIMARY KEY,
-    FOREIGN KEY (email_utente) REFERENCES Utente(email)
-);
 
 CREATE TABLE Progetto (
     nome VARCHAR(255) PRIMARY KEY,

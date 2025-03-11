@@ -4,6 +4,7 @@ document.getElementById("registerForm").addEventListener("submit", function (eve
 
     if (password !== confirmPassword) {
         alert("Le password non coincidono!");
+        event.preventDefault(); // Previene il submit del form
         return;
     }
 
