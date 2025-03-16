@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account</title>
+    <script src="account.js"></script>
+    <link rel="stylesheet" href="account.css"/>
+</head>
+<body>
+    <button id="go_home" onclick="window.location.href='../../index.php'">Home</button>
+    <div class="container">
+        <h1 id="nickname">Caricamento...</h1>
+
+        <div class="info">
+            <p><strong>Nome:</strong> <span id="name"></span></p>
+            <p><strong>Cognome:</strong> <span id="surname"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Anno di nascita:</strong> <span id="year"></span></p>
+            <p><strong>Luogo di nascita:</strong> <span id="place"></span></p>
+        </div>
+
+        <div class="skills-container">
+            <h3>Skill</h3>
+            <div id="skills"></div>
+        </div>
+        
+        <button id="logout" onclick="window.location.href='../../Backend/logout.php'">Logout</button>
+    </div>
+
+</body>
+</html>
+
