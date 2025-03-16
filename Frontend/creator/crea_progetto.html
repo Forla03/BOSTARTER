@@ -9,25 +9,45 @@
 <body>
     <h1>Crea un progetto</h1>
     <form>
-        <label for="tipo">Tipologia di progetto</label>
-        <menu id="menu">
-            <label for="hardware">Hardware</label>
-            <input type="checkbox" id="hardware" name="checkbox">
+        <label for="nome">Nome del progetto</label>
+        <input type="text" id="nome" required>
 
-            <label for="software">Hardware</label>
-            <input type="checkbox" id="software" name="checkbox">
+        <label for="descrizione">Nome del progetto</label>
+        <input type="text" id="descrizione" required>
+
+        <label for="budget">Budget del progetto</label>
+        <input type="number" id="budget" required>
+
+        <label for="data_inserimento">Nome del progetto</label>
+        <input type="date" id="data_inserimento" required>
+
+        <label for="data_limite">Nome del progetto</label>
+        <input type="date" id="data_limite" required>
+
+        <label for="immagini">Carica immagini</label>
+        <input type="file" id="immagini" name="immagini[]" accept="image/*" multiple >
+
+
+
+        <h2>Seleziona la tipologia di progetto</h2>
+        <menu id="menu" >
+            <label for="hardware">Hardware</label>
+            <input type="checkbox" id="cb_hardware" name="checkbox">
+
+            <label for="software">Software</label>
+            <input type="checkbox" id="cb_software" name="checkbox">
         </menu>
 
         <div id="input_hardware" style="visibility: hidden;">
 
-        <h2>Lista Componenti Hardware</h2>
+            <h2>Lista Componenti Hardware</h2>
 
-            <form id="form-componente">
-                <label for="nome">Nome Componente:</label>
-                <input type="text" id="nome" name="nome" placeholder="Nome del componente" required><br>
+           
+                <label for="nome_componente">Nome Componente:</label>
+                <input type="text" id="nome_componente" name="nome_componente" placeholder="Nome del componente" required><br>
 
-                <label for="descrizione">Descrizione Componente:</label>
-                <input type="text" id="descrizione" name="descrizione" placeholder="Descrizione" required><br>
+                <label for="descrizione_componente">Descrizione Componente:</label>
+                <input type="text" id="descrizione_componente" name="descrizione_componente" placeholder="Descrizione" required><br>
 
                 <label for="prezzo">Prezzo:</label>
                 <input type="number" id="prezzo" name="prezzo" placeholder="Prezzo" min="0" required><br>
@@ -36,17 +56,32 @@
                 <input type="number" id="quantita" name="quantita" placeholder="Quantità" min="1" required><br>
 
                 <button type="button" id="aggiungiComponente">Aggiungi Componente</button>
-            </form>
+    
 
             <h3>Lista Componenti Aggiunti:</h3>
             <div id="lista-componenti">
-                <!-- La lista dei componenti aggiunti verrà visualizzata qui -->
             </div>
 
         </div>
+
+
+        <div id="input_software" style="visibility: hidden;">
+
+            <h2>Lista Profili Software</h2>
+    
+            <label for="skillSelect">Seleziona una Skill:</label>
+            <select id="skillSelect">
+            </select>
+            <button type="button" id="aggiungiSkill">Clicca per selezionare</button>
+
+
+         </div>
+       
     </form>
 
+    
 
-    <script src="crea_progetto.js"></script>
+
 </body>
+<script src="crea_progetto.js"></script>
 </html>

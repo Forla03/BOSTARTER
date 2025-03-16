@@ -1,20 +1,44 @@
-document.getElementById("hardware").addEventListener("change", function() {
+document.addEventListener("DOMContentLoaded", function () {
+
+    fetch("../../Backend/get_skill.php")
+        .then(response => response.json())
+        .then(data => {
+
+            const skills = Array.isArray(data) ? data : [data];
+
+            const skillSelect = document.getElementById("skillSelect");
+            skills.forEach(skill => {
+                let option = document.createElement("option");
+                option.value = skill.nome_skill;
+                option.textContent = `${skill.nome_skill} (Livello: ${skill.livello})`;
+                skillSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error("Errore nel caricamento delle skill:", error));
+});
+
+
+document.getElementById("cb_hardware").addEventListener("change", function() {
     if (this.checked) {
-        document.getElementById("software").disabled = true; // Disabilita la seconda checkbox
+        document.getElementById("cb_software").disabled = true; // Disabilita la seconda checkbox
         document.getElementById("input_hardware").style.visibility= "visible";
     } else {
-        document.getElementById("software").disabled = false; // Riabilita la seconda checkbox
+        document.getElementById("cb_software").disabled = false; // Riabilita la seconda checkbox
         document.getElementById("input_hardware").style.visibility= "hidden";
     }
 });
 
-document.getElementById("software").addEventListener("change", function() {
+document.getElementById("cb_software").addEventListener("change", function() {
     if (this.checked) {
-        document.getElementById("hardware").disabled = true; // Disabilita la prima checkbox
+        document.getElementById("cb_hardware").disabled = true; // Disabilita la seconda checkbox
+        document.getElementById("input_software").style.visibility= "visible";
     } else {
-        document.getElementById("hardware").disabled = false; // Riabilita la prima checkbox
+        document.getElementById("cb_hardware").disabled = false; // Riabilita la seconda checkbox
+        document.getElementById("input_software").style.visibility= "hidden";
     }
 });
+
+
 
 document.getElementById("aggiungiComponente").addEventListener("click", function() {
     // Ottieni i valori degli input
@@ -62,3 +86,6 @@ document.getElementById("aggiungiComponente").addEventListener("click", function
         alert("Per favore, compila tutti i campi correttamente!");
     }
 });
+
+
+
