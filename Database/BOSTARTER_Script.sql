@@ -383,3 +383,16 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+CREATE VIEW View_user_features AS
+SELECT 
+    U.email,
+    U.nickname,
+    U.nome,
+    U.cognome,
+    U.anno_nascita,
+    U.luogo_nascita,
+    P.skill AS nome_skill,
+    P.livello_skill
+FROM Utente U
+LEFT JOIN Possedimento P ON U.email = P.emailUtente;
