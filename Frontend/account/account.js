@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(data => {
             console.log("Received data:", data);
-            
+
             if (data.success) {
                 let user = data.user;
 
@@ -22,14 +22,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Display the skills
                 let skillsContainer = document.getElementById("skills");
-                skillsContainer.innerHTML = ""; // Clear eventually existing skills
+                skillsContainer.innerHTML = ""; // Clear existing skills
 
                 if (user.skills && user.skills.length > 0) {
                     user.skills.forEach(skill => {
-                        let skillElement = document.createElement("div");
+                        let skillWrapper = document.createElement("div");
+                        skillWrapper.className = "skill-wrapper";
+
+                        let skillElement = document.createElement("span");
                         skillElement.className = "skill";
-                        skillElement.textContent = skill;
-                        skillsContainer.appendChild(skillElement);
+                        skillElement.textContent = `${skill.nome_skill} - Livello: ${skill.livello_skill}`;
+
+                        let skillDelete = document.createElement("button");
+                        skillDelete.className = "delete";
+                        skillDelete.textContent = "Elimina";
+                        skillDelete.onclick = function () {
+                            fetch("../../Backend/remove_skillsFromCurriculum.php", {
+                                method: "POST",
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: 'skill=' + encodeURIComponent(skill.nome_skill) + '&level=' + encodeURIComponent(skill.livello_skill)
+                            })
+                                .then(response => {
+                                    skillWrapper.remove();                                  
+                                })
+                                .catch(error => {
+                                    console.error("Error removing skill:", error);
+                                    alert("Errore durante l'eliminazione della skill.");
+                                });
+                        };
+
+                        skillWrapper.appendChild(skillElement);
+                        skillWrapper.appendChild(skillDelete);
+                        skillsContainer.appendChild(skillWrapper);
                     });
                 } else {
                     skillsContainer.innerHTML = "<p>Nessuna skill registrata.</p>";
@@ -42,5 +66,4 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("An error occurred while fetching the data:", error);
             document.body.innerHTML = "<h2>Errore nel caricamento dei dati</h2>";
         });
-
 });
