@@ -42,8 +42,8 @@ h1 {
     background: #e9ecef;
     padding: 15px;
     border-radius: 8px;
-    max-height: 150px; /* Imposta altezza massima */
-    overflow-y: auto; /* Scroll verticale */
+    max-height: 150px; 
+    overflow-y: auto; 
 }
 
 .skills-container h3 {
@@ -60,6 +60,35 @@ h1 {
     margin: 5px 0;
     text-align: center;
     font-size: 14px;
+}
+
+.skill-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/*delete buttons */
+.delete {
+    background: #dc3545; 
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background 0.3s ease;
+}
+
+.delete:hover {
+    background: #c82333; 
 }
 
 /* logout button*/
