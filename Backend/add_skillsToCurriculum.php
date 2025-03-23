@@ -19,7 +19,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":livello", $livello);
         $stmt->execute();
 
-        echo "Skill aggiunta al tuo curriculum!";
+        $logCollection = $mongoDb->selectCollection("logs_db");
+
+        try{
+            $logEntry = [
+                'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
+                'message' => 'Skill added to ' .$emailUtente. ' curriculum:'  . $skill,
+                'type' => 'Skill association',
+            ];
+            $logCollection->insertOne($logEntry);
+        }
+        catch (Exception $e) {
+            error_log("Errore nel salvataggio del log MongoDB: " . $e->getMessage());
+        }
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
