@@ -33,13 +33,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":luogo_nascita", $luogo_nascita);
         $stmt->execute();
 
-        $logCollection = $mongoDb->selectCollection("register_logs");
+        $logCollection = $mongoDb->selectCollection("logs_db");
 
         try {
             $logEntry = [
                 'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
                 'message' => 'New user registered: ' . $email,
-                'level' => 'info',
+                'type' => 'Registration',
             ];
             $logCollection->insertOne($logEntry);
         } catch (Exception $e) {
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $logEntry = [
                 'timestamp' => new MongoDB\BSON\UTCDateTime(),
                 'message' => 'New creator registered: ' . $email,
-                'level' => 'info',
+                'type' => 'Registration',
             ];
             $mongoDb->register_logs->insertOne($logEntry);
         }
