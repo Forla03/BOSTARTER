@@ -1,2 +1,5 @@
 config.php
 .vs/
+vendor
+composer.json
+composer.lock

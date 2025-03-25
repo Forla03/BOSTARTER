@@ -33,11 +33,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":luogo_nascita", $luogo_nascita);
         $stmt->execute();
 
+        $logCollection = $mongoDb->selectCollection("logs_db");
+
+        try {
+            $logEntry = [
+                'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
+                'message' => 'New user registered: ' . $email,
+                'type' => 'Registration',
+            ];
+            $logCollection->insertOne($logEntry);
+        } catch (Exception $e) {
+            error_log("Errore nel salvataggio del log MongoDB: " . $e->getMessage());
+        }
+
         // Se l'utente vuole essere un creator, lo aggiungiamo alla tabella Creator
         if ($isCreator) {
             $stmtCreator = $conn->prepare("INSERT INTO Creatore (email_utente) VALUES (:email)");
             $stmtCreator->bindParam(":email", $email);
             $stmtCreator->execute();
+
+            $logEntry = [
+                'timestamp' => new MongoDB\BSON\UTCDateTime(),
+                'message' => 'New creator registered: ' . $email,
+                'type' => 'Registration',
+            ];
+            $mongoDb->register_logs->insertOne($logEntry);
         }
 
         // Reindirizzamento alla pagina di login
