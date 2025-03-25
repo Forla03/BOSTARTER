@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Creator</title>
-    <link rel="stylesheet" href="crea_progetto.css"/>
 </head>
 <body>
     <h1>Crea un progetto</h1>
-    <form>
+    <form id="creaProgettoForm">
         <label for="nome">Nome del progetto</label>
         <input type="text" id="nome" required>
 
@@ -66,17 +65,42 @@
 
 
         <div id="input_software" style="visibility: hidden;">
-
             <h2>Lista Profili Software</h2>
-    
-            <label for="skillSelect">Seleziona una Skill:</label>
-            <select id="skillSelect">
-            </select>
-            <button type="button" id="aggiungiSkill">Clicca per selezionare</button>
-
-
-         </div>
-       
+            
+            <table  style="border:black solid 1px">
+                <thead>
+                    <tr>
+                        <th>Skill</th>
+                        <th>Livello</th>
+                        <th>Seleziona</th>
+                    </tr>
+                </thead>
+                <tbody id="skillTableBody">
+                    <!-- Le skill verranno caricate dinamicamente -->
+                </tbody>
+            </table>
+        
+            <button type="button" id="aggiungiSkill">Aggiungi Skill Selezionate</button>
+        
+            <!-- Tabella delle skill selezionate (inizialmente nascosta) -->
+            <h2 id="selectedSkillTitle" style="display: none;">Skill Selezionate</h2>
+            <table  style="border:black solid 1px" id="selectedSkillTable">
+                <thead>
+                    <tr>
+                        <th>Skill</th>
+                        <th>Livello</th>
+                        <th>Rimuovi</th>
+                    </tr>
+                </thead>
+                <tbody id="selectedSkillTableBody">
+                    <!-- Le skill selezionate compariranno qui -->
+                </tbody>
+            </table>
+        </div>
+        
+        
+        
+       <button type="button" id="crea_progetto">Crea Progetto</button> 
     </form>
 
     

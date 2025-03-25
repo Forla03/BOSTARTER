@@ -10,7 +10,7 @@ try {
     $stmt->execute();
     
     // Get the informations
-    $userInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+    $userInfo = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     header('Content-Type: application/json');
     if ($userInfo) {

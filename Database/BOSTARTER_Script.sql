@@ -109,6 +109,8 @@ CREATE TABLE Componente (
     prezzo INT NOT NULL
 );
 
+
+
 CREATE TABLE ProgettoComponente (
     nome_progetto VARCHAR(255),
     nome_componente VARCHAR(100),
@@ -122,6 +124,15 @@ CREATE TABLE ProgettoComponente (
 CREATE TABLE ProgettoSoftware (
     nome_progetto VARCHAR(255) PRIMARY KEY,
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
+);
+
+CREATE TABLE ProgettoSkill (
+    nome_progetto VARCHAR(255),
+    nome_skill VARCHAR(100),
+    livello_skill INT,
+    PRIMARY KEY (nome_progetto, nome_skill, livello_skill),
+    FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE,
+    FOREIGN KEY (nome_skill, livello_skill) REFERENCES CurriculumSkill(nome_skill, livello) ON DELETE CASCADE
 );
 
 CREATE TABLE Profilo (
@@ -215,7 +226,22 @@ BEGIN
     VALUES (p_nome);
 END $$
 
+CREATE PROCEDURE AggiungiSkillProgettoSoftware(
+    IN p_nome VARCHAR(255),
+    IN s_nome VARCHAR(255),
+    IN s_livello INT
+)
+BEGIN
+    -- Inserisce il progetto nella tabella Progetto
+    INSERT INTO ProgettoSkill (nome_progetto, nome_skill, livello)
+    VALUES (p_nome, s_nome, s_livello);
+END $$
+
+
+
 DELIMITER ;
+
+
 
 DELIMITER $$
 
