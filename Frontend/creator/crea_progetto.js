@@ -202,46 +202,38 @@ document.getElementById("crea-progetto").addEventListener("click", function() {
             alert("Errore durante la creazione del progetto: " + error.message);
         });
     }else {
-        // Seleziona il form
+        // Manage the software project
         let form = document.getElementById("creaProgettoForm");
-        let formData = new FormData(form); // Passa il form al costruttore FormData
+        const formData = new FormData();
+    
+        formData.append('nome', form.querySelector('#nome').value);
+        formData.append('descrizione', form.querySelector('#descrizione').value);
+        formData.append('budget', form.querySelector('#budget').value);
+        formData.append('data_inserimento', form.querySelector('#data_inserimento').value);
+        formData.append('data_limite', form.querySelector('#data_limite').value);
+    
+        const fileInput = form.querySelector('#immagini');
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('immagini[]', fileInput.files[i]);
+        }
 
-        // Invia la richiesta al server per creare il progetto
+        const skills = [];
+        selectedSkills.forEach((livello, skill) => {
+            skills.push({
+                nome_skill: skill,
+                livello: livello
+            });
+        });
+        formData.append('skills', JSON.stringify(skills));
+
+        // Post the data to the backend
         fetch("../../Backend/create_project_software.php", {
             method: "POST",
             body: formData
         })
         .catch(error => {
             console.error("Errore:", error);
-            document.getElementById("response").innerText = "Errore nell'invio dei dati.";
         });
-
-        // Per ogni skill, invia una richiesta separata
-        selectedSkills.forEach((livello, skill) => {
-            // Crea un oggetto per la skill
-            const skillData = {
-                nome: skill,
-                livello: livello
-            };
-
-            // Invia la richiesta per ogni skill selezionata
-            fetch("../../Backend/add_skills_to_software_project.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(skillData), // Invia solo la skill singola
-            })
-            .then(response => response.text())
-            .then(data => {
-                console.log(`Skill ${skill} aggiunta con successo!`);
-                // Puoi anche gestire la risposta dal server, ad esempio, visualizzando un messaggio.
-            })
-            .catch(error => {
-                console.error("Errore durante l'aggiunta della skill:", error);
-            });
-        });
-
-        // Aggiungi eventuali altre azioni, come la gestione delle immagini o altre informazioni
+        document.getElementById("selectedSkillTable").innerHTML = "";
     }
 });
