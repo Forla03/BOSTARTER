@@ -1,0 +1,163 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    margin: 0;
+}
+
+h1 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+form {
+    background: white;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #333;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="file"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin-top: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+#menu {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+#input_hardware,
+#input_software {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    transition: visibility 0.3s;
+}
+
+h2 {
+    color: #007bff;
+    margin-top: 25px;
+    font-size: 1.4em;
+}
+
+h3 {
+    color: #333;
+    margin-top: 20px;
+}
+
+.componente {
+    background: white;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+.componente button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: #dc3545;
+}
+
+.componente button:hover {
+    background-color: #c82333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+.remove-skill {
+    background-color: #dc3545;
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.remove-skill:hover {
+    background-color: #c82333;
+}
+
+#selectedSkillTable {
+    margin-top: 20px;
+}
+
+#crea-progetto {
+    width: 100%;
+    margin-top: 30px;
+    font-weight: bold;
+}
+
+/* Stile per i campi obbligatori */
+input:required {
+    border-left: 3px solid #007bff;
+}
+/* Responsive design */
+@media (max-width: 768px) {
+    form {
+        padding: 15px;
+    }
+    
+    th, td {
+        padding: 8px;
+    }
+}

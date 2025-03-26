@@ -103,21 +103,15 @@ CREATE TABLE ProgettoHardware (
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
-CREATE TABLE Componente (
-    nome VARCHAR(100) PRIMARY KEY,
-    descrizione TEXT NOT NULL,
-    prezzo INT NOT NULL
-);
-
-
 
 CREATE TABLE ProgettoComponente (
     nome_progetto VARCHAR(255),
     nome_componente VARCHAR(100),
     quantita INT NOT NULL CHECK (quantita > 0),
+    descrizione TEXT NOT NULL,
+    prezzo INT NOT NULL,
     PRIMARY KEY (nome_progetto, nome_componente),
-    FOREIGN KEY (nome_progetto) REFERENCES ProgettoHardware(nome_progetto) ON DELETE CASCADE,
-    FOREIGN KEY (nome_componente) REFERENCES Componente(nome)
+    FOREIGN KEY (nome_progetto) REFERENCES ProgettoHardware(nome_progetto) ON DELETE CASCADE
 );
 
 
