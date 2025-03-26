@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Creator</title>
+    <link rel="stylesheet" href="crea_progetto.css">
 </head>
 <body>
     <h1>Crea un progetto</h1>
@@ -11,22 +12,20 @@
         <label for="nome">Nome del progetto</label>
         <input type="text" id="nome" required>
 
-        <label for="descrizione">Nome del progetto</label>
+        <label for="descrizione">Descrizione del progetto</label>
         <input type="text" id="descrizione" required>
 
         <label for="budget">Budget del progetto</label>
         <input type="number" id="budget" required>
 
-        <label for="data_inserimento">Nome del progetto</label>
+        <label for="data_inserimento">Data di inserimento</label>
         <input type="date" id="data_inserimento" required>
 
-        <label for="data_limite">Nome del progetto</label>
+        <label for="data_limite">Data limite</label>
         <input type="date" id="data_limite" required>
 
         <label for="immagini">Carica immagini</label>
-        <input type="file" id="immagini" name="immagini[]" accept="image/*" multiple >
-
-
+        <input type="file" id="immagini" name="immagini[]" accept="image/*" multiple >    
 
         <h2>Seleziona la tipologia di progetto</h2>
         <menu id="menu" >
@@ -41,7 +40,7 @@
 
             <h2>Lista Componenti Hardware</h2>
 
-           
+            
                 <label for="nome_componente">Nome Componente:</label>
                 <input type="text" id="nome_componente" name="nome_componente" placeholder="Nome del componente" required><br>
 
@@ -55,7 +54,7 @@
                 <input type="number" id="quantita" name="quantita" placeholder="Quantità" min="1" required><br>
 
                 <button type="button" id="aggiungiComponente">Aggiungi Componente</button>
-    
+            
 
             <h3>Lista Componenti Aggiunti:</h3>
             <div id="lista-componenti">
@@ -100,7 +99,7 @@
         
         
         
-       <button type="button" id="crea_progetto">Crea Progetto</button> 
+       <button type="button" id="crea-progetto">Crea Progetto</button> 
     </form>
 
     

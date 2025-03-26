@@ -47,14 +47,14 @@ document.getElementById("cb_software").addEventListener("change", function() {
 
 document.getElementById("aggiungiComponente").addEventListener("click", function() {
     // Ottieni i valori degli input
-    const nome = document.getElementById("nome").value;
-    const descrizione = document.getElementById("descrizione").value;
+    const nome = document.getElementById("nome_componente").value;
+    const descrizione = document.getElementById("descrizione_componente").value;
     const prezzo = document.getElementById("prezzo").value;
     const quantita = document.getElementById("quantita").value;
 
     // Verifica che tutti i campi siano compilati
     if (nome && descrizione && prezzo && quantita > 0) {
-        // Crea una nuova riga con le informazioni del componente
+        // Crea una nuova riga con le informazioni del componente 
         const componenteDiv = document.createElement("div");
         componenteDiv.classList.add("componente");
 
@@ -67,16 +67,26 @@ document.getElementById("aggiungiComponente").addEventListener("click", function
             <button class="rimuovi-componente">Rimuovi</button>
         `;
 
-        // Aggiungi la riga alla lista
-        document.getElementById("lista-componenti").appendChild(componenteDiv);
-
-        // Rendi gli input del form vuoti dopo aver aggiunto un componente
-        document.getElementById("form-componente").reset();
-        
-        // Gestione del bottone "Rimuovi"
-        componenteDiv.querySelector(".rimuovi-componente").addEventListener("click", function() {
-            componenteDiv.remove(); // Rimuove il componente dalla lista
+        // Add to the list if not already present
+        // Else, update the existing component by adding the quantity
+        let listComponenti =Array.from(document.getElementById("lista-componenti").children);
+        let presente = false;
+        listComponenti.forEach(componente => {
+            if(componente.querySelector("p:nth-child(1)").textContent.replace("Nome: ", "").trim() === nome) {
+                currentAmount = parseInt(componenteDiv.querySelector("p:nth-child(4)").textContent.replace("Quantità: ", "").trim(), 10);
+                componente.querySelector("p:nth-child(4)").textContent = "Quantità: " + (parseInt(componente.querySelector("p:nth-child(4)").textContent.replace("Quantità: ", "").trim(), 10) + currentAmount);
+                presente = true;
+                return;
+            }
         });
+        
+        if(!presente){
+            document.getElementById("lista-componenti").appendChild(componenteDiv);
+            // Gestione del bottone "Rimuovi"
+            componenteDiv.querySelector(".rimuovi-componente").addEventListener("click", function() {
+                componenteDiv.remove(); // Rimuove il componente dalla lista
+            });
+        }
     }
 });
 
@@ -138,12 +148,60 @@ function checkSkillTableVisibility() {
     }
 }
 
-document.getElementById("crea_progetto").addEventListener("click", function() {
+document.getElementById("crea-progetto").addEventListener("click", function() {
     if (controllo == 0) {
         alert("Seleziona la tipologia di progetto che vuoi creare");
     } else if (controllo == 1) {
-        // Gestione per hardware
-    } else {
+        // Manage hardware project
+        let form = document.getElementById("creaProgettoForm");
+        const formData = new FormData();
+    
+        formData.append('nome', form.querySelector('#nome').value);
+        formData.append('descrizione', form.querySelector('#descrizione').value);
+        formData.append('budget', form.querySelector('#budget').value);
+        formData.append('data_inserimento', form.querySelector('#data_inserimento').value);
+        formData.append('data_limite', form.querySelector('#data_limite').value);
+    
+        const fileInput = form.querySelector('#immagini');
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('immagini[]', fileInput.files[i]);
+        }
+    
+        const componenti = [];
+        document.querySelectorAll(".componente").forEach(componenteDiv => {
+            componenti.push({
+                nome_componente: componenteDiv.querySelector("p:nth-child(1)").textContent.replace("Nome: ", "").trim(),
+                descrizione: componenteDiv.querySelector("p:nth-child(2)").textContent.replace("Descrizione: ", "").trim(),
+                prezzo: parseFloat(componenteDiv.querySelector("p:nth-child(3)").textContent.replace("Prezzo: €", "").trim()),
+                quantita: parseInt(componenteDiv.querySelector("p:nth-child(4)").textContent.replace("Quantità: ", "").trim(), 10)
+            });
+        });
+        formData.append('componenti', JSON.stringify(componenti));    
+        
+        fetch("../../Backend/create_project_hardware.php", {
+            method: "POST",
+            body: formData 
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Successo:", data);
+            if (data.success) {
+                form.reset();
+                document.getElementById("lista-componenti").innerHTML = "";
+            } else {
+                throw new Error(data.message || "Errore sconosciuto");
+            }
+        })
+        .catch(error => {
+            console.error("Errore:", error);
+            alert("Errore durante la creazione del progetto: " + error.message);
+        });
+    }else {
         // Seleziona il form
         let form = document.getElementById("creaProgettoForm");
         let formData = new FormData(form); // Passa il form al costruttore FormData
