@@ -39,7 +39,7 @@
     <section class="hero">
         <h1>Finanzia e scopri progetti innovativi</h1>
         <p>Unisciti alla community e supporta lo sviluppo di idee rivoluzionarie.</p>
-        <button class="cta" onclick="window.location.href= 'Frontend/projects/progetti.php'">Esplora i progetti</button>
+        <button class="cta" onclick="window.location.href= 'Frontend/general_projectsView/general.HTML'">Esplora i progetti</button>
     </section>
 
     <section class="categories">
