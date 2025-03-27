@@ -1,8 +1,7 @@
-DROP DATABASE IF EXISTS BOSTARTER_DB;
 CREATE DATABASE IF NOT EXISTS BOSTARTER_DB;
 USE BOSTARTER_DB;
 
-CREATE TABLE Utente (
+CREATE TABLE IF NOT EXISTS Utente (
     email VARCHAR(255) PRIMARY KEY,
     nickname VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -12,13 +11,13 @@ CREATE TABLE Utente (
     luogo_nascita VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE CurriculumSkill (
+CREATE TABLE IF NOT EXISTS CurriculumSkill (
     nome_skill VARCHAR(100),
     livello INT CHECK (livello BETWEEN 0 AND 5),
     PRIMARY KEY (nome_skill, livello)
 );
 
-CREATE TABLE Possedimento (
+CREATE TABLE IF NOT EXISTS Possedimento (
     emailUtente VARCHAR(100),
     skill VARCHAR(100),
     livello_skill INT,
@@ -27,13 +26,13 @@ CREATE TABLE Possedimento (
     FOREIGN KEY (skill, livello_skill) REFERENCES CurriculumSkill(nome_skill, livello)
 );
 
-CREATE TABLE Amministratore (
+CREATE TABLE IF NOT EXISTS Amministratore (
     email_utente VARCHAR(255) PRIMARY KEY,
     codice_sicurezza CHAR(5) NOT NULL,
     FOREIGN KEY (email_utente) REFERENCES Utente(email)
 );
 
-CREATE TABLE Creatore (
+CREATE TABLE IF NOT EXISTS Creatore (
     email_utente VARCHAR(255) PRIMARY KEY,
     nr_progetti INT DEFAULT 0,
     affidabilita INT DEFAULT 0 CHECK (affidabilita >= 0),
@@ -41,7 +40,7 @@ CREATE TABLE Creatore (
 );
 
 
-CREATE TABLE Progetto (
+CREATE TABLE IF NOT EXISTS Progetto (
     nome VARCHAR(255) PRIMARY KEY,
     descrizione TEXT NOT NULL,
     data_inserimento DATE NOT NULL,
@@ -53,14 +52,14 @@ CREATE TABLE Progetto (
     FOREIGN KEY (email_creatore) REFERENCES Creatore(email_utente)
 );
 
-CREATE TABLE FotoProgetto (
+CREATE TABLE IF NOT EXISTS FotoProgetto (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome_progetto VARCHAR(255) NOT NULL,
     foto BLOB NOT NULL,
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
-CREATE TABLE Reward (
+CREATE TABLE IF NOT EXISTS Reward (
     codice INT AUTO_INCREMENT PRIMARY KEY,
     nome_progetto VARCHAR(255) NOT NULL,
     descrizione TEXT NOT NULL,
@@ -68,7 +67,7 @@ CREATE TABLE Reward (
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
-CREATE TABLE Finanziamento (
+CREATE TABLE IF NOT EXISTS Finanziamento (
     email_utente VARCHAR(255) NOT NULL,
     nome_progetto VARCHAR(255) NOT NULL,
     importo FLOAT NOT NULL,
@@ -80,7 +79,7 @@ CREATE TABLE Finanziamento (
     FOREIGN KEY (codice_reward) REFERENCES Reward(codice)
 );
 
-CREATE TABLE Commento (
+CREATE TABLE IF NOT EXISTS Commento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email_utente VARCHAR(255) NOT NULL,
     nome_progetto VARCHAR(255) NOT NULL,
@@ -90,7 +89,7 @@ CREATE TABLE Commento (
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome)
 );
 
-CREATE TABLE RispostaCommento (
+CREATE TABLE IF NOT EXISTS RispostaCommento (
     id_commento INT PRIMARY KEY,
     email_creatore VARCHAR(255) NOT NULL,
     testo TEXT NOT NULL,
@@ -98,13 +97,13 @@ CREATE TABLE RispostaCommento (
     FOREIGN KEY (email_creatore) REFERENCES Creatore(email_utente) ON DELETE CASCADE
 );
 
-CREATE TABLE ProgettoHardware (
+CREATE TABLE IF NOT EXISTS ProgettoHardware (
     nome_progetto VARCHAR(255) PRIMARY KEY,
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
 
-CREATE TABLE ProgettoComponente (
+CREATE TABLE IF NOT EXISTS ProgettoComponente (
     nome_progetto VARCHAR(255),
     nome_componente VARCHAR(100),
     quantita INT NOT NULL CHECK (quantita > 0),
@@ -115,12 +114,12 @@ CREATE TABLE ProgettoComponente (
 );
 
 
-CREATE TABLE ProgettoSoftware (
+CREATE TABLE IF NOT EXISTS ProgettoSoftware (
     nome_progetto VARCHAR(255) PRIMARY KEY,
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
-CREATE TABLE ProgettoSkill (
+CREATE TABLE IF NOT EXISTS ProgettoSkill (
     nome_progetto VARCHAR(255),
     nome_skill VARCHAR(100),
     livello_skill INT,
@@ -129,11 +128,11 @@ CREATE TABLE ProgettoSkill (
     FOREIGN KEY (nome_skill, livello_skill) REFERENCES CurriculumSkill(nome_skill, livello) ON DELETE CASCADE
 );
 
-CREATE TABLE Profilo (
+CREATE TABLE IF NOT EXISTS Profilo (
     nome VARCHAR(100) PRIMARY KEY
 );
 
-CREATE TABLE ProfiliElenco (
+CREATE TABLE IF NOT EXISTS ProfiliElenco (
     nome_profilo VARCHAR(100),
     nome_progetto VARCHAR(255),
     PRIMARY KEY (nome_profilo, nome_progetto),
@@ -141,7 +140,7 @@ CREATE TABLE ProfiliElenco (
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto)
 );
 
-CREATE TABLE SkillsProfilo (
+CREATE TABLE IF NOT EXISTS SkillsProfilo (
     nome_profilo VARCHAR(100),
     nome_skill VARCHAR(100),
     livello INT,
@@ -150,7 +149,7 @@ CREATE TABLE SkillsProfilo (
     FOREIGN KEY (nome_skill, livello) REFERENCES CurriculumSkill(nome_skill, livello)
 );
 
-CREATE TABLE Candidatura (
+CREATE TABLE IF NOT EXISTS Candidatura (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email_utente VARCHAR(255) NOT NULL,
     nome_progetto VARCHAR(255) NOT NULL,
@@ -160,6 +159,22 @@ CREATE TABLE Candidatura (
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE,
     FOREIGN KEY (nome_profilo) REFERENCES Profilo(nome)
 );
+
+DROP TRIGGER IF EXISTS AggiornaStatoProgetto;
+
+DROP PROCEDURE IF EXISTS AggiungiProgettoHardware;
+DROP PROCEDURE IF EXISTS AggiungiProgettoSoftware;
+DROP PROCEDURE IF EXISTS AggiungiSkillProgettoSoftware;
+DROP PROCEDURE IF EXISTS FinanziaProgetto;
+DROP PROCEDURE IF EXISTS VisualizzaProgettiDisponibili;
+DROP PROCEDURE IF EXISTS ScegliReward;
+DROP PROCEDURE IF EXISTS InserisciCommento;
+DROP PROCEDURE IF EXISTS InviaCandidatura;
+DROP PROCEDURE IF EXISTS DiventaCreatore;
+DROP PROCEDURE IF EXISTS RifiutaRichiestaCreatore;
+DROP PROCEDURE IF EXISTS AggiungiAmministratore;
+DROP VIEW IF EXISTS View_user_features;
+DROP VIEW IF EXISTS View_general_project;
 
 DELIMITER $$
 
@@ -416,3 +431,18 @@ SELECT
     P.livello_skill
 FROM Utente U
 LEFT JOIN Possedimento P ON U.email = P.emailUtente;
+
+CREATE VIEW View_general_project AS
+SELECT 
+    P.nome AS NomeProgetto,
+    P.descrizione AS Descrizione,
+    P.budget AS Budget,
+    COALESCE(SUM(F.importo), 0) AS TotaleFinanziato,
+    CASE 
+        WHEN EXISTS (SELECT 1 FROM ProgettoHardware PH WHERE PH.nome_progetto = P.nome) THEN 'Hardware'
+        WHEN EXISTS (SELECT 1 FROM ProgettoSoftware PS WHERE PS.nome_progetto = P.nome) THEN 'Software'
+        ELSE 'Altro'
+    END AS TipoProgetto
+FROM Progetto P
+LEFT JOIN Finanziamento F ON P.nome = F.nome_progetto
+GROUP BY P.nome, P.descrizione, P.budget;
