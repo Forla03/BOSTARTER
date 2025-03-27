@@ -77,6 +77,18 @@ try {
         "message" => "Project and components added successfully",
         "uploaded_files" => !empty($_FILES['immagini']) ? count($_FILES['immagini']['name']) : 0
     ]);
+
+    try {
+        $logEntry = [
+            'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
+            'message' => 'New software project created: ' . $name,
+            'type' => 'Creation',
+        ];
+        $logCollection->insertOne($logEntry);
+    } catch (Exception $e) {
+        error_log("Errore nel salvataggio del log MongoDB: " . $e->getMessage());
+    }
+
 } catch (Exception $e) {
     $conn->rollBack();
     echo json_encode([
