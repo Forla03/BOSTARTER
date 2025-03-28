@@ -445,4 +445,5 @@ SELECT
     END AS TipoProgetto
 FROM Progetto P
 LEFT JOIN Finanziamento F ON P.nome = F.nome_progetto
+WHERE P.stato = "aperto"
 GROUP BY P.nome, P.descrizione, P.budget;
