@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             let title = document.createElement('h3');
             let titleLink = document.createElement('a'); 
             titleLink.textContent = project.NomeProgetto;
-            titleLink.href = `../projectView/projectView.html?nomeProgetto=${encodeURIComponent(project.NomeProgetto)}`;
+            titleLink.href = `../projectView/projectView.html?nomeProgetto=${encodeURIComponent(project.NomeProgetto)}&tipoProgetto=${encodeURIComponent(project.TipoProgetto)}`;
             title.appendChild(titleLink);
         
             let description = document.createElement('p');
