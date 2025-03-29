@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzia</title>
+    <link rel="stylesheet" href="contribute.css">
+</head>
+<body>
+    <header>
+        <h1 id="page-title"></h1>
+    </header>
+    
+    <main>
+        <section id="contribute-section">
+            <h2>Contribuisci al progetto</h2>
+            <form id="donation-form">
+                <label for="donation-amount">Importo (€):</label>
+                <input type="number" id="donation-amount" name="donation-amount" min="1" required>
+                <button type="submit" id="donate-button">Dona</button>
+            </form>
+        </section>
+    </main>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectName = urlParams.get('nomeProgetto');
+            if (projectName) {
+                document.getElementById("page-title").textContent = "Finanzia " + projectName;
+            }
+        });
+    </script>
+</body>
+<script src="contribute.js"></script>
+</html>

@@ -21,7 +21,13 @@ document.addEventListener('DOMContentLoaded', async function() {
             let title = document.createElement('h3');
             let titleLink = document.createElement('a'); 
             titleLink.textContent = project.NomeProgetto;
-            titleLink.href = `../projectView/projectView.html?nomeProgetto=${encodeURIComponent(project.NomeProgetto)}&tipoProgetto=${encodeURIComponent(project.TipoProgetto)}`;
+
+            if(jsonResponse.logged){
+                titleLink.href = `../projectView/projectView.html?nomeProgetto=${encodeURIComponent(project.NomeProgetto)}&tipoProgetto=${encodeURIComponent(project.TipoProgetto)}`;
+            }
+            else{
+                titleLink.href = `../login/login.html`;
+            }
             title.appendChild(titleLink);
         
             let description = document.createElement('p');
