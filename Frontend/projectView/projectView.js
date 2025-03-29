@@ -63,6 +63,7 @@ function renderProjectData(data, projectType) {
             <div class="project-meta">
                 <span><strong>Categoria:</strong> ${projectType}</span>
                 <span><strong>Data scadenza:</strong> ${new Date(data.progetto.data_limite).toLocaleDateString()}</span>
+                <a href = "./contribute.html?nomeProgetto=${data.progetto.nome}" class="contribute-button">Contribuisci</a>
             </div>
         </div>
     `;

@@ -113,6 +113,15 @@ header {
     animation: shimmer 2s infinite linear;
 }
 
+.contribute-button{
+    text-decoration: none;
+    background: var(--primary);
+    color: var(--white);
+    padding-left: 2%;
+    padding-right: 2%;
+    border-radius: var(--radius);
+}
+
 .project-meta {
     display: flex;
     gap: 2rem;

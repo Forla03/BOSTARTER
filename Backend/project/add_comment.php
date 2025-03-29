@@ -31,7 +31,7 @@ try {
     $stmt->bindValue(1, $email, PDO::PARAM_STR);
     $stmt->bindValue(2,$name, PDO::PARAM_STR);
     $stmt->bindValue(3,$date, PDO::PARAM_STR);
-    $stmt->bindValue(4,$text, $text, PDO::PARAM_STR);
+    $stmt->bindValue(4,$text, PDO::PARAM_STR);
     $stmt->execute();
 
     echo json_encode(["success" => true, "username" => $_SESSION['nickname']]);

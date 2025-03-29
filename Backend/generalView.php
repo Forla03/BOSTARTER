@@ -16,7 +16,8 @@ try {
     // Return the results as a JSON response
     echo json_encode([
         "success" => true,
-        "data" => $results
+        "data" => $results,
+        "logged" => isset($_SESSION['email']),
     ]);
 
 } catch (PDOException $e) {
