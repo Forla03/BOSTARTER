@@ -78,6 +78,7 @@ try {
         "uploaded_files" => !empty($_FILES['immagini']) ? count($_FILES['immagini']['name']) : 0
     ]);
 
+    $logCollection = $mongoDb->selectCollection("logs_db");
     try {
         $logEntry = [
             'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
