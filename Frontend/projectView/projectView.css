@@ -143,8 +143,11 @@ header {
     padding: 1.5rem;
     border: 1px solid rgba(0,0,0,0.05);
     transition: var(--transition);
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    height: 30vh;
 }
-
 .reward-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
@@ -155,6 +158,15 @@ header {
     color: var(--success);
     margin: 1rem 0;
 }
+
+.reward-image {
+    max-width: 100%;  
+    height: auto; 
+    object-fit: cover; 
+    width: 100%; 
+    border-radius: var(--radius); 
+}
+
 
 .comments-list {
     margin-top: 1.5rem;

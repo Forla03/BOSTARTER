@@ -31,12 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
-        // Query to get project's rewards
-        $stmt = $conn->prepare("SELECT codice, descrizione FROM Reward WHERE nome_progetto = :nome_progetto");
-        $stmt->bindParam(':nome_progetto', $nome_progetto, PDO::PARAM_STR);
-        $stmt->execute();
-        $rewards = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         // Query to get project's comments
         $stmt = $conn->prepare("SELECT C.id, C.email_utente, C.data, C.testo, U.nickname
             FROM Commento C
@@ -51,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode([
             "success" => true,
             "progetto" => $progetto,
-            "rewards" => $rewards,
             "commenti" => $commenti
         ]);
     } catch (PDOException $e) {

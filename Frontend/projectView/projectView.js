@@ -70,27 +70,50 @@ function renderProjectData(data, projectType) {
     container.appendChild(projectInfo);
 
     // Rewards section
-    if (data.rewards && data.rewards.length > 0) {
-        const rewardsContainer = document.createElement("div");
-        rewardsContainer.classList.add('rewards-section');
-        rewardsContainer.innerHTML = "<h2>Ricompense</h2>";
-        
-        const rewardsList = document.createElement("div");
-        rewardsList.classList.add('rewards-list');
-        
-        data.rewards.forEach(reward => {
-            const rewardElement = document.createElement("div");
-            rewardElement.classList.add('reward-card');
-            rewardElement.innerHTML = `
-                <h3>${reward.descrizione}</h3>
-                <p class="reward-minimum">Contributo minimo: ${reward.importo_minimo}€</p>
-            `;
-            rewardsList.appendChild(rewardElement);
-        });
-        
-        rewardsContainer.appendChild(rewardsList);
-        container.appendChild(rewardsContainer);
-    }
+    rewardUrl = "../../Backend/project/get_rewards.php";
+    fetch(rewardUrl, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nome_progetto: data.progetto.nome }),
+    })
+    .then(response => response.json())
+    .then(rewardsData => {
+        if (rewardsData.error) {
+            console.error("Errore nel recupero delle ricompense:", rewardsData.error);
+            displayError(rewardsData.error);
+            return;
+        }
+
+        if (rewardsData && rewardsData.length > 0) {
+            const rewardsContainer = document.createElement("div");
+            rewardsContainer.classList.add('rewards-section');
+            rewardsContainer.innerHTML = "<h2>Ricompense</h2>";
+
+            const rewardsList = document.createElement("div");
+            rewardsList.classList.add('rewards-list');
+
+            rewardsData.forEach(reward => {
+                const rewardElement = document.createElement("div");
+                rewardElement.classList.add('reward-card');
+                rewardElement.innerHTML = `
+                    <h3>${reward.descrizione}</h3>
+                    <img src="${reward.foto}" class="reward-image">
+                `;
+                rewardsList.appendChild(rewardElement);
+            });
+
+            rewardsContainer.appendChild(rewardsList);
+            container.appendChild(rewardsContainer);
+        } else {
+            console.log("Nessuna ricompensa trovata per questo progetto.");
+        }
+    })
+    .catch(error => {
+        console.error("Errore nella richiesta delle ricompense:", error);
+        displayError("Errore nel caricamento delle ricompense.");
+    });
 
     // Comment section
     const commentsContainer = document.createElement("div");
