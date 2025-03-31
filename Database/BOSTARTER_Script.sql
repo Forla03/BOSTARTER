@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS Progetto (
 CREATE TABLE IF NOT EXISTS FotoProgetto (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome_progetto VARCHAR(255) NOT NULL,
-    foto BLOB NOT NULL,
+    foto LONGBLOB NOT NULL,
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS Reward (
     codice INT AUTO_INCREMENT PRIMARY KEY,
     nome_progetto VARCHAR(255) NOT NULL,
     descrizione TEXT NOT NULL,
-    foto BLOB NOT NULL,
+    foto LONGBLOB NOT NULL,
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 

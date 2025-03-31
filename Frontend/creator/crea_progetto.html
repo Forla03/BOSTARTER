@@ -27,6 +27,23 @@
         <label for="immagini">Carica immagini</label>
         <input type="file" id="immagini" name="immagini[]" accept="image/*" multiple >    
 
+        <div id="rewards-form">
+            <h2>Ricompense</h2>
+
+            <label for="reward_description">Descrizione della ricompensa</label>
+            <input type="text" id="reward_description">
+
+            <label for="reward_pic">Immagine della ricompensa</label>
+            <input type="file" id="reward_pic" accept="image/*">
+
+            <button type="button" id="addReward-button">Aggiungi ricompensa</button>
+        
+        </div>
+        <h3 id="h3_rewards">Lista Ricompense Aggiunte</h3>
+        <div id="rewards-container">
+
+        </div>
+
         <h2>Seleziona la tipologia di progetto</h2>
         <menu id="menu" >
             <label for="hardware">Hardware</label>

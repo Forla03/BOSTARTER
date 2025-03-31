@@ -20,6 +20,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 let controllo=0;
+
+document.getElementById("addReward-button").addEventListener("click", function() {;
+    const rewardDescription = document.getElementById("reward_description").value.trim();
+    const rewardPic = document.getElementById("reward_pic").files[0];
+
+    if (!rewardDescription || !rewardPic) {
+        alert("Compila tutti i campi obbligatori per aggiungere una ricompensa.");
+        return;
+    }
+
+    const rewardDiv = document.createElement("div");
+    rewardDiv.classList.add("reward", "reward-item");
+
+    let rewardHTML = `
+        <p><strong>Descrizione:</strong> ${rewardDescription}</p>
+    `;
+
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Rimuovi";
+    removeButton.classList.add("remove-reward");
+    removeButton.addEventListener("click", function() {
+        rewardDiv.remove(); 
+    });
+
+    rewardDiv.dataset.fileIndex = Date.now(); 
+
+    if (rewardPic) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            rewardDiv.innerHTML = rewardHTML + `<img src="${e.target.result}" alt="Immagine Ricompensa" style="max-width: 200px; max-height: 200px;">`;
+            rewardDiv.appendChild(document.createElement("br")); 
+            rewardDiv.appendChild(removeButton); 
+        };
+        reader.readAsDataURL(rewardPic);
+        
+        let imageReference = rewardPic;
+        rewardDiv.file = imageReference; // Append the image reference to the div
+    } else {
+        rewardDiv.innerHTML = rewardHTML;
+        rewardDiv.appendChild(removeButton);
+    }
+
+    document.getElementById("rewards-container").appendChild(rewardDiv);
+
+    document.getElementById("reward_description").value = "";
+    document.getElementById("reward_pic").value = "";
+});
+
+
+
 // Mostra/Nasconde i form in base al tipo di progetto selezionato
 document.getElementById("cb_hardware").addEventListener("change", function() {
     if (this.checked) {
@@ -148,7 +198,45 @@ function checkSkillTableVisibility() {
     }
 }
 
-document.getElementById("crea-progetto").addEventListener("click", function() {
+function getRewards() {
+    const rewards = [];
+    const rewardDivs = document.querySelectorAll(".reward-item");
+
+    rewardDivs.forEach(rewardDiv => {
+        const description = rewardDiv.querySelector("p:nth-child(1)").textContent.replace("Descrizione: ", "").trim();
+        const imageFile = rewardDiv.file; // Get the image reference from the div
+
+        rewards.push({
+            description: description,
+            image: imageFile
+        });
+    });
+
+    return rewards;
+}
+
+function postRewards(rewards, nome_progetto) {
+    const formData = new FormData();
+    formData.append('nome_progetto', nome_progetto);
+
+    rewards.forEach((reward, index) => {
+        formData.append(`rewards[${index}][description]`, reward.description);
+        formData.append(`rewards[${index}][image]`, reward.image, reward.image.name); 
+    });
+    
+    return fetch("../../Backend/add_reward.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+}
+
+document.getElementById("crea-progetto").addEventListener("click", async function() {
     if (controllo == 0) {
         alert("Seleziona la tipologia di progetto che vuoi creare");
     } else if (controllo == 1) {
@@ -178,30 +266,31 @@ document.getElementById("crea-progetto").addEventListener("click", function() {
         });
         formData.append('componenti', JSON.stringify(componenti));    
         
-        fetch("../../Backend/create_project_hardware.php", {
-            method: "POST",
-            body: formData 
-        })
-        .then(response => {
+        try {
+            const response = await fetch("../../Backend/create_project_hardware.php", {
+                method: "POST",
+                body: formData 
+            });
+
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Successo:", data);
-            if (data.success) {
+
+            const data = await response.json();
+
+            const rewardResponse = (await postRewards(getRewards(), form.querySelector('#nome').value));
+
+            if (data.success && rewardResponse.success) {
                 form.reset();
                 document.getElementById("lista-componenti").innerHTML = "";
             } else {
                 throw new Error(data.message || "Errore sconosciuto");
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error("Errore:", error);
             alert("Errore durante la creazione del progetto: " + error.message);
-        });
-    }else {
+        }
+    } else {
         // Manage the software project
         let form = document.getElementById("creaProgettoForm");
         const formData = new FormData();
@@ -226,14 +315,31 @@ document.getElementById("crea-progetto").addEventListener("click", function() {
         });
         formData.append('skills', JSON.stringify(skills));
 
-        // Post the data to the backend
-        fetch("../../Backend/create_project_software.php", {
-            method: "POST",
-            body: formData
-        })
-        .catch(error => {
+        try {
+            const response = await fetch("../../Backend/create_project_software.php", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+
+            const rewardResponse = await postRewards(getRewards(), form.querySelector('#nome').value);
+
+            if (data.success && rewardResponse.success) {
+                form.reset();
+                document.getElementById("lista-componenti").innerHTML = "";
+            } else {
+                throw new Error("Errore sconosciuto");
+            }
+        } catch (error) {
             console.error("Errore:", error);
-        });
-        document.getElementById("selectedSkillTable").innerHTML = "";
+        }
     }
+
+    // Reset the selected skills table
+    document.getElementById("selectedSkillTable").innerHTML = "";
 });
