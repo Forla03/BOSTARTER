@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS Finanziamento (
     nome_progetto VARCHAR(255) NOT NULL,
     importo FLOAT NOT NULL,
     data DATE NOT NULL,
-    codice_reward INT NOT NULL UNIQUE,
+    codice_reward INT NOT NULL,
     PRIMARY KEY (email_utente, nome_progetto, data),
     FOREIGN KEY (email_utente) REFERENCES Utente(email),
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome),
@@ -119,33 +119,21 @@ CREATE TABLE IF NOT EXISTS ProgettoSoftware (
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS ProgettoSkill (
-    nome_progetto VARCHAR(255),
-    nome_skill VARCHAR(100),
-    livello_skill INT,
-    PRIMARY KEY (nome_progetto, nome_skill, livello_skill),
-    FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE,
-    FOREIGN KEY (nome_skill, livello_skill) REFERENCES CurriculumSkill(nome_skill, livello) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS ProgettoProfilo (
+    nome_progetto VARCHAR(255) NOT NULL,
+    nome_profilo VARCHAR(100) NOT NULL,
+    PRIMARY KEY (nome_progetto, nome_profilo),
+    FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Profilo (
-    nome VARCHAR(100) PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS ProfiliElenco (
-    nome_profilo VARCHAR(100),
-    nome_progetto VARCHAR(255),
-    PRIMARY KEY (nome_profilo, nome_progetto),
-    FOREIGN KEY (nome_profilo) REFERENCES Profilo(nome),
-    FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto)
-);
 
 CREATE TABLE IF NOT EXISTS SkillsProfilo (
-    nome_profilo VARCHAR(100),
+    nome_profilo VARCHAR(100) NOT NULL,
+    nome_progetto VARCHAR(255) NOT NULL,
     nome_skill VARCHAR(100),
     livello INT,
-    PRIMARY KEY (nome_profilo, nome_skill, livello),
-    FOREIGN KEY (nome_profilo) REFERENCES Profilo(nome),
+    PRIMARY KEY (nome_profilo, nome_progetto, nome_skill, livello),
+    FOREIGN KEY (nome_progetto, nome_profilo) REFERENCES ProgettoProfilo(nome_progetto, nome_profilo),
     FOREIGN KEY (nome_skill, livello) REFERENCES CurriculumSkill(nome_skill, livello)
 );
 
@@ -157,7 +145,7 @@ CREATE TABLE IF NOT EXISTS Candidatura (
     accettata BOOLEAN DEFAULT NULL,
     FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE,
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE,
-    FOREIGN KEY (nome_profilo) REFERENCES Profilo(nome)
+    FOREIGN KEY (nome_progetto, nome_profilo) REFERENCES ProgettoProfilo(nome_progetto, nome_profilo)
 );
 
 DROP TRIGGER IF EXISTS AggiornaStatoProgetto;
@@ -333,10 +321,12 @@ DELIMITER ;
 
 DELIMITER $$
 
+DELIMITER $$
+
 CREATE PROCEDURE InviaCandidatura(
     IN p_email_utente VARCHAR(255),
     IN p_nome_progetto VARCHAR(255),
-    IN p_nome_profilo VARCHAR(100)
+    IN p_id_profilo INT
 )
 BEGIN
     DECLARE progetto_esiste INT;
@@ -347,15 +337,15 @@ BEGIN
     FROM ProgettoSoftware
     WHERE nome_progetto = p_nome_progetto;
 
-    -- Controlla se il profilo � richiesto per il progetto
+    -- Controlla se il profilo esiste per il progetto
     SELECT COUNT(*) INTO profilo_esiste
-    FROM ProfiliElenco
-    WHERE nome_progetto = p_nome_progetto AND nome_profilo = p_nome_profilo;
+    FROM ProgettoProfilo
+    WHERE id = p_id_profilo AND nome_progetto = p_nome_progetto;
 
     IF progetto_esiste > 0 AND profilo_esiste > 0 THEN
         -- Inserisce la candidatura
-        INSERT INTO Candidatura (email_utente, nome_progetto, nome_profilo)
-        VALUES (p_email_utente, p_nome_progetto, p_nome_profilo);
+        INSERT INTO Candidatura (email_utente, nome_progetto, id_profilo)
+        VALUES (p_email_utente, p_nome_progetto, p_id_profilo);
     ELSE
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Il progetto o il profilo non esistono.';

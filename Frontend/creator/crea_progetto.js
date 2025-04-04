@@ -148,45 +148,47 @@ const selectedSkillTableBody = document.getElementById("selectedSkillTableBody")
 
 // Nasconde la tabella inizialmente
 selectedSkillTable.style.display = "none";
+const profili = new Map();
 
-// Mappa per tenere traccia delle skill selezionate
-const selectedSkills = new Map();
-
-document.getElementById("aggiungiSkill").addEventListener("click", function () {
-    let selectedAny = false;
-
-    document.querySelectorAll(".skill-checkbox:checked").forEach(checkbox => {
-        const skillName = checkbox.value;
-        const skillLevel = checkbox.dataset.livello;
-
-        if (!selectedSkills.has(skillName)) {
-            selectedSkills.set(skillName, skillLevel);
-
-            let row = document.createElement("tr");
-            row.setAttribute("data-skill", skillName);
-            row.innerHTML = `
-                <td>${skillName}</td>
-                <td>${skillLevel}</td>
-                <td><button class="remove-skill">Rimuovi</button></td>
-            `;
-            selectedSkillTableBody.appendChild(row);
-
-            // Aggiunge l'evento per rimuovere la skill
-            row.querySelector(".remove-skill").addEventListener("click", function () {
-                selectedSkills.delete(skillName); // Rimuove dalla mappa
-                row.remove();
-                checkSkillTableVisibility();
-            });
-
-            selectedAny = true;
-        }
-
-        // Deseleziona la checkbox dopo l'aggiunta
-        checkbox.checked = false;
+document.getElementById("aggiungiProfilo").addEventListener("click", function() {
+    const nomeProfilo = document.getElementById("nome_profilo").value.trim();
+    if (!nomeProfilo || profili.has(nomeProfilo)) {
+        alert("Nome profilo già esistente o non valido.");
+        return;
+    }
+    let selectedSkills = Array.from(document.querySelectorAll("#skillTableBody .skill-checkbox:checked")).map(checkbox => {
+        return {
+            nome_skill: checkbox.value,
+            livello: checkbox.dataset.livello
+        };
     });
 
-    // Mostra la tabella solo se ci sono skill aggiunte
-    checkSkillTableVisibility();
+    if (selectedSkills.length === 0) {
+        alert("Seleziona almeno una skill per il profilo.");
+        return;
+    }
+    
+    profili.set(nomeProfilo, selectedSkills);
+
+    
+    // Aggiorna l'interfaccia: aggiungi la "card" del profilo con pulsante Rimuovi
+    const profiloCard = document.createElement("div");
+    profiloCard.classList.add("profilo-card");
+    profiloCard.dataset.nomeProfilo = nomeProfilo;
+    profiloCard.innerHTML = `<h3>${nomeProfilo}</h3>
+                             <p>Skills:</p>
+                             <ul>
+                                ${selectedSkills.map(skill => `<li>${skill.nome_skill} (Livello: ${skill.livello})</li>`).join("")}
+                             </ul>
+                             <button class="remove-profilo">Rimuovi</button>`;
+    document.getElementById("listaProfili").appendChild(profiloCard);
+    document.getElementById("nome_profilo").value = "";
+
+    // Listener per il pulsante "Rimuovi" della card
+    profiloCard.querySelector(".remove-profilo").addEventListener("click", function() {
+        profili.delete(nomeProfilo); // Rimuove il profilo dalla mappa
+        profiloCard.remove(); // Rimuove la card del profilo
+    });
 });
 
 // Funzione per controllare se la tabella deve essere mostrata
@@ -306,14 +308,12 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
             formData.append('immagini[]', fileInput.files[i]);
         }
 
-        const skills = [];
-        selectedSkills.forEach((livello, skill) => {
-            skills.push({
-                nome_skill: skill,
-                livello: livello
-            });
-        });
-        formData.append('skills', JSON.stringify(skills));
+        const profiliArray = Array.from(profili, ([nomeProfilo, skills]) => ({
+            nome_profilo: nomeProfilo,
+            skills: skills
+        }));
+
+        formData.append('profili', JSON.stringify(profiliArray));
 
         try {
             const response = await fetch("../../Backend/create_project_software.php", {
@@ -331,7 +331,7 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
 
             if (data.success && rewardResponse.success) {
                 form.reset();
-                document.getElementById("lista-componenti").innerHTML = "";
+                profili.clear();
             } else {
                 throw new Error("Errore sconosciuto");
             }
