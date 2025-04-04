@@ -81,9 +81,9 @@
 
 
         <div id="input_software" style="visibility: hidden;">
-            <h2>Lista Profili Software</h2>
-            
-            <table  style="border:black solid 1px">
+            <!-- Sezione per la visualizzazione delle skill disponibili -->
+            <h2>Seleziona le Skill Disponibili</h2>
+            <table style="border: black solid 1px">
                 <thead>
                     <tr>
                         <th>Skill</th>
@@ -92,27 +92,37 @@
                     </tr>
                 </thead>
                 <tbody id="skillTableBody">
-                    <!-- Le skill verranno caricate dinamicamente -->
+                    <!-- Le skill verranno caricate dinamicamente dal fetch -->
                 </tbody>
             </table>
         
-            <button type="button" id="aggiungiSkill">Aggiungi Skill Selezionate</button>
+            <!-- Sezione per la creazione di un nuovo profilo -->
+            <h2>Aggiungi Profilo</h2>
+            <div id="nuovoProfilo">
+                <label for="nome_profilo">Nome Profilo:</label>
+                <input type="text" id="nome_profilo">
+                <button type="button" id="aggiungiProfilo">Aggiungi Profilo</button>
+            </div>
         
-            <!-- Tabella delle skill selezionate (inizialmente nascosta) -->
-            <h2 id="selectedSkillTitle" style="display: none;">Skill Selezionate</h2>
-            <table  style="border:black solid 1px" id="selectedSkillTable">
-                <thead>
-                    <tr>
-                        <th>Skill</th>
-                        <th>Livello</th>
-                        <th>Rimuovi</th>
-                    </tr>
-                </thead>
-                <tbody id="selectedSkillTableBody">
-                    <!-- Le skill selezionate compariranno qui -->
-                </tbody>
-            </table>
+            <div id="profiloSkillsContainer" style="display: none;">
+                <table style="border: black solid 1px" id="selectedSkillTable">
+                    <thead>
+                        <tr>
+                            <th>Skill</th>
+                            <th>Livello</th>
+                            <th>Rimuovi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        
+            <!-- Sezione per la visualizzazione dei profili creati -->
+            <h2>Lista Profili Creati</h2>
+            <div id="listaProfili">
+                <!-- Qui verranno aggiunte le card per ogni profilo creato -->
+            </div>
         </div>
+        
         
         
         

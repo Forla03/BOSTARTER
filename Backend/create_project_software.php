@@ -10,7 +10,7 @@ try {
     $budget = $_POST['budget'] ?? null;
     $final_date = $_POST['data_limite'] ?? null;
     $creator_email = $_SESSION['email'] ?? null;
-    $skills = json_decode($_POST['skills'] ?? '[]', true);
+    $profiles = json_decode($_POST['profili'] ?? '[]', true);
 
     if (!$name || !$description || !$start_date || !$budget || !$final_date || !$creator_email) {
         throw new Exception("Dati mancanti o non validi.");
@@ -31,22 +31,42 @@ try {
     }
     $stmt->closeCursor();
 
-    $stmtSkills = $conn->prepare("INSERT INTO progettoskill (nome_progetto, nome_skill, livello_skill) 
-                                   VALUES (:project_name, :skill_name, :skill_level)");
+    $stmtProfile = $conn->prepare("INSERT INTO ProgettoProfilo (nome_progetto, nome_profilo) 
+                                   VALUES (:project_name, :profile_name)");
+    $stmtSkills = $conn->prepare("INSERT INTO SkillsProfilo (nome_progetto, nome_profilo, nome_skill, livello) 
+                                   VALUES (:project_name, :profile_name, :skill_name, :skill_level)");
 
-    foreach ($skills as $skill) {
-        $skill_name = $skill['nome_skill'] ?? null;
-        $skill_level = (int)($skill['livello'] ?? 0);
+    foreach ($profiles as $profile) {
+        $profileName = $profile['nome_profilo'] ?? null;
+        $skills = $profile['skills'] ?? [];
 
-        if (!$skill_name || $skill_level <= 0) {
-            throw new Exception("Dati skill non validi.");
+        if (!$profileName) {
+            throw new Exception("Profile name is missing.");
         }
 
-        $stmtSkills->execute([
-            ':project_name' => $name,
-            ':skill_name' => $skill_name,
-            ':skill_level' => $skill_level
-        ]);
+        // Insert profile into ProgettoProfilo
+        $stmtProfile->bindParam(":project_name", $name);
+        $stmtProfile->bindParam(":profile_name", $profileName);
+        if (!$stmtProfile->execute()) {
+            throw new Exception("Error inserting profile: " . implode(" ", $stmtProfile->errorInfo()));
+        }
+
+        // Insert skills into SkillsProfilo
+        foreach ($skills as $skill) {
+            $skillName = $skill['nome_skill'] ?? null;
+            $skillLevel = $skill['livello'] ?? null;
+            if (!$skillName || !$skillLevel) {
+                throw new Exception("Skill name or level is missing for profile: $profileName.");
+            }
+
+            $stmtSkills->bindParam(":project_name", $name);
+            $stmtSkills->bindParam(":profile_name", $profileName);
+            $stmtSkills->bindParam(":skill_name", $skillName);
+            $stmtSkills->bindParam(":skill_level", $skillLevel);
+            if (!$stmtSkills->execute()) {
+                throw new Exception("Error inserting skill: " . implode(" ", $stmtSkills->errorInfo()));
+            }
+        }
     }
 
     // Put images if any
@@ -74,7 +94,7 @@ try {
     $conn->commit();
     echo json_encode([
         "success" => true, 
-        "message" => "Project and components added successfully",
+        "message" => "Project and profiles added successfully",
         "uploaded_files" => !empty($_FILES['immagini']) ? count($_FILES['immagini']['name']) : 0
     ]);
 
