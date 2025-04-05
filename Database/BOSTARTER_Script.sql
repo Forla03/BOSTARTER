@@ -138,11 +138,11 @@ CREATE TABLE IF NOT EXISTS SkillsProfilo (
 );
 
 CREATE TABLE IF NOT EXISTS Candidatura (
-    id INT AUTO_INCREMENT PRIMARY KEY,
     email_utente VARCHAR(255) NOT NULL,
     nome_progetto VARCHAR(255) NOT NULL,
     nome_profilo VARCHAR(100) NOT NULL,
-    accettata BOOLEAN DEFAULT NULL,
+    accettata BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (email_utente, nome_progetto, nome_profilo),
     FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE,
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE,
     FOREIGN KEY (nome_progetto, nome_profilo) REFERENCES ProgettoProfilo(nome_progetto, nome_profilo)
@@ -324,32 +324,45 @@ DELIMITER $$
 DELIMITER $$
 
 CREATE PROCEDURE InviaCandidatura(
-    IN p_email_utente VARCHAR(255),
-    IN p_nome_progetto VARCHAR(255),
-    IN p_id_profilo INT
+    IN email_utente VARCHAR(255),
+    IN nome_progetto_input VARCHAR(255),
+    IN nome_profilo_input VARCHAR(255)
 )
 BEGIN
-    DECLARE progetto_esiste INT;
-    DECLARE profilo_esiste INT;
+    DECLARE candidatura_esistente INT;
+    DECLARE ha_skill_necessarie INT;
 
-    -- Controlla se il progetto software esiste
-    SELECT COUNT(*) INTO progetto_esiste
-    FROM ProgettoSoftware
-    WHERE nome_progetto = p_nome_progetto;
+    -- Verifica se l'utente ha già inviato una candidatura
+    SELECT COUNT(*) INTO candidatura_esistente
+    FROM Candidatura
+    WHERE email_utente = email_utente 
+      AND nome_progetto = nome_progetto_input 
+      AND nome_profilo = nome_profilo_input;
 
-    -- Controlla se il profilo esiste per il progetto
-    SELECT COUNT(*) INTO profilo_esiste
-    FROM ProgettoProfilo
-    WHERE id = p_id_profilo AND nome_progetto = p_nome_progetto;
-
-    IF progetto_esiste > 0 AND profilo_esiste > 0 THEN
-        -- Inserisce la candidatura
-        INSERT INTO Candidatura (email_utente, nome_progetto, id_profilo)
-        VALUES (p_email_utente, p_nome_progetto, p_id_profilo);
-    ELSE
+    IF candidatura_esistente > 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Il progetto o il profilo non esistono.';
+        SET MESSAGE_TEXT = 'TI_SEI_GIA_CANDIDATO';
     END IF;
+
+    -- Verifica se l'utente possiede tutte le skill richieste
+    SELECT COUNT(*) INTO ha_skill_necessarie
+    FROM SkillsProfilo sp
+    LEFT JOIN Possedimento p 
+        ON sp.nome_skill = p.skill 
+        AND p.emailUtente = email_utente  
+        AND sp.livello <= p.livello_skill
+    WHERE sp.nome_progetto = nome_progetto_input 
+      AND sp.nome_profilo = nome_profilo_input
+      AND p.emailUtente IS NULL;  -- Cerca skill mancanti
+
+    IF ha_skill_necessarie > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'SKILL_NON_SODDISFATTE';
+    END IF;
+
+    -- Inserisci la candidatura se tutto è corretto
+    INSERT INTO Candidatura(email_utente, nome_progetto, nome_profilo)
+    VALUES (email_utente, nome_progetto_input, nome_profilo_input);
 END $$
 
 DELIMITER ;

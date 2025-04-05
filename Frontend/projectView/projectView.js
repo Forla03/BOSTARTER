@@ -1,8 +1,32 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const urlParams = new URLSearchParams(window.location.search);
     const projectName = urlParams.get('nomeProgetto');
     const projectType = urlParams.get('tipoProgetto');
     url = "../../Backend/project/get_projectData.php";
+    var profilesData = null; 
+
+    if (projectType.toLowerCase() === "software") {
+        try {
+            const response = await fetch("../../Backend/project/get_profiles.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ nome_progetto: projectName }),
+            });
+            profilesData = await response.json();
+            if (profilesData.error) {
+                console.error("Errore nel recupero dei profili:", profilesData.error);
+                displayError(profilesData.error);
+                return;
+            }
+            console.log("Dati dei profili recuperati:", profilesData); // Debug
+        } catch (error) {
+            console.error("Errore nella richiesta dei profili:", error);
+            displayError("Errore nel caricamento dei profili.");
+            return;
+        }
+    }
 
     fetch(url, {
         method: "POST",
@@ -14,8 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            console.log("Dati del progetto:", data);
-            renderProjectData(data, projectType);
+            renderProjectData(data, projectType, profilesData);
         } else {
             console.error("Errore nel recupero dati:", data.message);
             displayError(data.message);
@@ -27,7 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function renderProjectData(data, projectType) {
+
+function renderProjectData(data, projectType, profilesData) {
     const container = document.getElementById("project-container");
     if (!container) {
         console.error("Elemento project-container non trovato");
@@ -68,6 +92,97 @@ function renderProjectData(data, projectType) {
         </div>
     `;
     container.appendChild(projectInfo);
+
+    if (profilesData) {
+        // Profiles section
+        const profilesContainer = document.createElement("div");
+        profilesContainer.classList.add('profiles-section');
+        profilesContainer.innerHTML = "<h2>Profili</h2>";
+    
+        const profilesList = document.createElement("div");
+        profilesList.classList.add('profiles-list');
+    
+        profilesData.profiles.forEach(profile => {
+            const profileElement = document.createElement("div");
+            profileElement.classList.add('profile-card');
+    
+            // Profile details
+            profileElement.innerHTML = `
+                <h3>${profile.nome_profilo}</h3>
+                <ul class="skills-list">
+                    ${profile.skills.map(skill => `
+                        <li>
+                            <strong>${skill.nome_skill}</strong> - Livello: ${skill.livello}
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+    
+            // Apply button
+            const applyButton = document.createElement("button");
+            applyButton.classList.add('apply-button');
+            applyButton.textContent = "Candidati";
+            applyButton.addEventListener("click", () => {
+                fetch("../../Backend/project/apply_profile.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        nome_profilo: profile.nome_profilo,
+                        nome_progetto: data.progetto.nome,
+                    }),
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        alert("Candidatura inviata con successo!");
+                    } else {
+                        const tooltip = document.createElement("div");
+                        tooltip.classList.add("tooltip-bubble");
+
+                        tooltip.textContent = result.message;
+
+                        // Calculate position for the tooltip
+                        const buttonRect = applyButton.getBoundingClientRect();
+                        const viewportHeight = window.innerHeight;
+                        const tooltipHeight = 50; 
+
+                        // Avoid border overflow
+                        if (buttonRect.bottom + tooltipHeight + 10 > viewportHeight) {
+                            // Show tooltip above the button if there's not enough space below
+                            tooltip.style.top = `${buttonRect.top - tooltipHeight - 5}px`;
+                            tooltip.classList.add('top-position');
+                        } else {
+                            tooltip.style.top = `${buttonRect.bottom + 5}px`;
+                        }
+
+                        tooltip.style.left = `${buttonRect.left + (buttonRect.width / 2)}px`;
+                        tooltip.style.transform = 'translateX(-50%)';
+
+                        document.body.appendChild(tooltip);
+
+                        // Display the tooltip for 3 seconds
+                        setTimeout(() => {
+                            tooltip.remove();
+                        }, 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error("Errore nella richiesta di candidatura:", error);
+                    displayError("Errore nell'invio della candidatura.");
+                });
+               
+            });
+    
+            profileElement.appendChild(applyButton);
+            profilesList.appendChild(profileElement);
+        });
+    
+        profilesContainer.appendChild(profilesList);
+        container.appendChild(profilesContainer);
+    }
+
 
     // Rewards section
     rewardUrl = "../../Backend/project/get_rewards.php";
