@@ -161,6 +161,7 @@ DROP PROCEDURE IF EXISTS InviaCandidatura;
 DROP PROCEDURE IF EXISTS DiventaCreatore;
 DROP PROCEDURE IF EXISTS RifiutaRichiestaCreatore;
 DROP PROCEDURE IF EXISTS AggiungiAmministratore;
+DROP PROCEDURE IF EXISTS AccettaCandidatura;
 DROP VIEW IF EXISTS View_user_features;
 DROP VIEW IF EXISTS View_general_project;
 
@@ -367,6 +368,65 @@ END $$
 
 DELIMITER ;
 
+DELIMITER $$
+
+DELIMITER $$
+
+CREATE PROCEDURE AccettaCandidatura(
+    IN p_email_candidato VARCHAR(255),
+    IN p_nome_progetto VARCHAR(255),
+    IN p_nome_profilo VARCHAR(100),
+    IN p_email_corrente VARCHAR(255)
+)
+BEGIN
+    DECLARE creatore_progetto VARCHAR(255);
+    DECLARE candidatura_esistente INT;
+    DECLARE già_accettata BOOLEAN;
+
+    -- Recupera il creatore del progetto
+    SELECT email_creatore INTO creatore_progetto
+    FROM Progetto 
+    WHERE Progetto.nome = p_nome_progetto;
+
+    IF creatore_progetto IS NULL THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Progetto non trovato.';
+    ELSEIF creatore_progetto != p_email_corrente THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Non autorizzato.';
+    ELSE
+        -- Controlla se la candidatura esiste
+        SELECT COUNT(*) INTO candidatura_esistente
+        FROM Candidatura
+        WHERE email_utente = p_email_candidato
+          AND nome_progetto = p_nome_progetto
+          AND nome_profilo = p_nome_profilo;
+
+        -- Controlla se la candidatura è già accettata
+        SELECT accettata INTO già_accettata
+        FROM Candidatura
+        WHERE email_utente = p_email_candidato
+          AND nome_progetto = p_nome_progetto
+          AND nome_profilo = p_nome_profilo
+        LIMIT 1;
+
+        IF candidatura_esistente = 0 THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Candidatura non trovata.';
+        ELSEIF già_accettata THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Candidatura già accettata.';
+        ELSE
+            UPDATE Candidatura
+            SET accettata = TRUE
+            WHERE email_utente = p_email_candidato
+              AND nome_progetto = p_nome_progetto
+              AND nome_profilo = p_nome_profilo;
+        END IF;
+    END IF;
+END $$
+
+DELIMITER ;
 DELIMITER $$
 
 -- Procedura per accettare la richiesta e aggiungere l'utente a Creatore

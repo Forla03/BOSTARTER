@@ -5,6 +5,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     url = "../../Backend/project/get_projectData.php";
     var profilesData = null; 
 
+    //Get user email
+    const userEmailRequest = await fetch("../../Backend/session.php") ?? null;
+    const userData = await userEmailRequest.json();
+    const userEmail = userData.email_value ?? null;
+
     if (projectType.toLowerCase() === "software") {
         try {
             const response = await fetch("../../Backend/project/get_profiles.php", {
@@ -38,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            renderProjectData(data, projectType, profilesData);
+            renderProjectData(data, projectType, profilesData, userEmail);
         } else {
             console.error("Errore nel recupero dati:", data.message);
             displayError(data.message);
@@ -51,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 
-function renderProjectData(data, projectType, profilesData) {
+function renderProjectData(data, projectType, profilesData, userEmail) {
     const container = document.getElementById("project-container");
     if (!container) {
         console.error("Elemento project-container non trovato");
@@ -176,6 +181,20 @@ function renderProjectData(data, projectType, profilesData) {
             });
     
             profileElement.appendChild(applyButton);
+
+            //Manage candidacy button
+
+            if(data.progetto.email_creatore === userEmail){
+                const viewProfileButton = document.createElement("a");
+                viewProfileButton.classList.add('view-profile-button');
+                viewProfileButton.textContent = "Gestisci le candidature"
+                viewProfileButton.href = `./manageApplications.html?nome_profilo=${profile.nome_profilo}&nome_progetto=${data.progetto.nome}`;
+
+                profileElement.appendChild(applyButton);
+                profileElement.appendChild(viewProfileButton);
+                profilesList.appendChild(profileElement);
+            }
+
             profilesList.appendChild(profileElement);
         });
     
