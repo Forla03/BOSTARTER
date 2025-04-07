@@ -322,6 +322,31 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE PROCEDURE InserisciRispostaCommento(
+    IN p_id_commento INT,
+    IN p_email_creatore VARCHAR(255),
+    IN p_testo TEXT
+)
+BEGIN
+    -- Controlla se il commento esiste
+    IF EXISTS (SELECT 1 FROM Commento WHERE id = p_id_commento) THEN
+        -- Controlla se l'email appartiene a un creatore
+        IF EXISTS (SELECT 1 FROM Creatore WHERE email_utente = p_email_creatore) THEN
+            -- Inserisce la risposta nella tabella RispostaCommento
+            INSERT INTO RispostaCommento (id_commento, email_creatore, testo)
+            VALUES (p_id_commento, p_email_creatore, p_testo);
+        ELSE
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Email fornita non appartiene a un creatore.';
+        END IF;
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Il commento specificato non esiste.';
+    END IF;
+END $$
+
+DELIMITER ;
+
 DELIMITER $$
 
 CREATE PROCEDURE InviaCandidatura(
