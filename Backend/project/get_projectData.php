@@ -40,6 +40,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
         $commenti = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Query to get replies for each comment
+
+        $stmt = $conn->prepare("SELECT R.id_commento, R.email_creatore, R.testo, U.nickname
+            FROM RispostaCommento R
+            JOIN Creatore C ON R.email_creatore = C.email_utente
+            JOIN Utente U ON C.email_utente = U.email");
+        $stmt->execute();
+        $risposte = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Associate replies with their respective comments
+        foreach ($commenti as &$commento) {
+            $commento['risposte'] = array_values(array_filter($risposte, function ($risposta) use ($commento) {
+                return $risposta['id_commento'] === $commento['id'];
+            }));
+        }
+
 
         // Final data
         echo json_encode([

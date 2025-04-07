@@ -318,12 +318,99 @@ function renderProjectData(data, projectType, profilesData, userEmail) {
         const commentElement = document.createElement("div");
         commentElement.classList.add('comment');
         commentElement.innerHTML = `
-            <div class="comment-header">
+            <div class="comment-header" data-comment-id="${comment.id}">
                 <strong class="comment-author">${comment.nickname}</strong>
                 <span class="comment-date">${new Date(comment.data).toLocaleDateString()}</span>
             </div>
             <p class="comment-text">${comment.testo}</p>
         `;
+
+        if (comment.risposte && comment.risposte.length > 0) {
+            // For now, a comment can have only one reply, so we take the first one
+            const reply = comment.risposte[0];
+            const replyElement = document.createElement("div");
+            replyElement.classList.add('comment-reply');
+            replyElement.innerHTML = `
+                <div class="reply-header">
+                    <strong class="reply-author">${reply.nickname}</strong>
+                </div>
+                <p class="reply-text">${reply.testo}</p>
+            `;
+            commentElement.appendChild(replyElement);
+        } 
+        // If the user is the creator of the project and it has not replies, show the reply button
+        else if (data.progetto.email_creatore === userEmail) {
+            const replyButton = document.createElement("button");
+            replyButton.classList.add("reply-button");
+            replyButton.textContent = "Rispondi al commento";
+            replyButton.addEventListener("click", function () {
+                // Avoid multiple forms
+                const existingForm = commentElement.querySelector(".reply-form");
+                if (existingForm){
+                    existingForm.remove();
+                    return;
+                }            
+                // Create the reply form
+                const form = document.createElement("div");
+                form.classList.add("reply-form");
+                form.innerHTML = `
+                    <textarea class="reply-input" placeholder="Scrivi la tua risposta..."></textarea>
+                    <button class="send-reply-button">INVIA RISPOSTA</button>
+                `;
+            
+                commentElement.appendChild(form);
+            
+                // Manage the reply button and post the reply
+                const sendButton = form.querySelector(".send-reply-button");
+                sendButton.addEventListener("click", async () => {
+                    const replyText = form.querySelector(".reply-input").value.trim();
+            
+                    if (replyText === "") {
+                        alert("Il testo della risposta non può essere vuoto.");
+                        return;
+                    }
+            
+                    try {
+                        const response = await fetch("../../Backend/project/add_reply.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id_commento: comment.id,
+                                testo: replyText
+                            })
+                        });
+            
+                        const result = await response.json();
+            
+                        if (result.success) {                           
+                            const replyElement = document.createElement("div");
+                            replyElement.classList.add("comment-reply");
+                            replyElement.innerHTML = `
+                                <div class="reply-header">
+                                    <strong class="reply-author">${result.username}</strong>
+                                </div>
+                                <p class="reply-text">${replyText}</p>
+                            `;
+                              
+                            form.remove();
+                            replyButton.remove();
+            
+                            // Add the reply after removing the form and button
+                            commentElement.appendChild(replyElement);
+                        } else {
+                            alert("Errore durante l'invio della risposta: " + result.error);
+                        }
+                    } catch (error) {
+                        console.error("Errore nella richiesta:", error);
+                        alert("Errore nella richiesta.");
+                    }
+                });
+            });
+            commentElement.appendChild(replyButton);
+        }
+
         commentsList.appendChild(commentElement);
     });
 
