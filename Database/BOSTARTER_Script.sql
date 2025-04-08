@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS BOSTARTER_DB;
 USE BOSTARTER_DB;
+SET GLOBAL event_scheduler = ON;
 
 CREATE TABLE IF NOT EXISTS Utente (
     email VARCHAR(255) PRIMARY KEY,
@@ -148,7 +149,17 @@ CREATE TABLE IF NOT EXISTS Candidatura (
     FOREIGN KEY (nome_progetto, nome_profilo) REFERENCES ProgettoProfilo(nome_progetto, nome_profilo)
 );
 
+CREATE EVENT IF NOT EXISTS ChiudiProgettiScaduti
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO
+    UPDATE Progetto
+    SET stato = 'chiuso'
+    WHERE data_limite < CURDATE() AND stato = 'aperto';
+
 DROP TRIGGER IF EXISTS AggiornaStatoProgetto;
+DROP TRIGGER IF EXISTS AggiornaAffidabilitaDopoCreazioneProgetto;
+DROP TRIGGER IF EXISTS AggiornaAffidabilitaDopoFinanziamento;
 
 DROP PROCEDURE IF EXISTS AggiungiProgettoHardware;
 DROP PROCEDURE IF EXISTS AggiungiProgettoSoftware;
@@ -162,8 +173,13 @@ DROP PROCEDURE IF EXISTS DiventaCreatore;
 DROP PROCEDURE IF EXISTS RifiutaRichiestaCreatore;
 DROP PROCEDURE IF EXISTS AggiungiAmministratore;
 DROP PROCEDURE IF EXISTS AccettaCandidatura;
+DROP PROCEDURE IF EXISTS InserisciRispostaCommento;
+
 DROP VIEW IF EXISTS View_user_features;
 DROP VIEW IF EXISTS View_general_project;
+DROP VIEW IF EXISTS View_top_creators;
+DROP VIEW IF EXISTS View_progetti_vicini_completamento;
+DROP VIEW IF EXISTS View_top_funders;
 
 DELIMITER $$
 
@@ -185,6 +201,84 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+DELIMITER $$
+
+DELIMITER $$
+
+CREATE TRIGGER AggiornaAffidabilitaDopoCreazioneProgetto
+AFTER INSERT ON Progetto
+FOR EACH ROW
+BEGIN
+
+    DECLARE numeratore INT DEFAULT 0;
+    DECLARE denominatore INT DEFAULT 0;
+
+    -- Incrementa il numero di progetti del creatore
+    UPDATE Creatore
+    SET nr_progetti = nr_progetti + 1
+    WHERE email_utente = NEW.email_creatore;
+
+    -- Calcola i progetti con almeno un finanziamento (numeratore)
+    SELECT COUNT(DISTINCT P.nome)
+    INTO numeratore
+    FROM Progetto P
+    JOIN Finanziamento F ON P.nome = F.nome_progetto
+    WHERE P.email_creatore = NEW.email_creatore;
+
+    -- Calcola il numero totale di progetti del creatore (denominatore)
+    SELECT COUNT(*)
+    INTO denominatore
+    FROM Progetto
+    WHERE email_creatore = NEW.email_creatore;
+
+    -- Aggiorna l'affidabilità 
+    UPDATE Creatore
+    SET affidabilita = IF(denominatore = 0, 0, ROUND((numeratore / denominatore) * 100))
+    WHERE email_utente = NEW.email_creatore;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER AggiornaAffidabilitaDopoFinanziamento
+AFTER INSERT ON Finanziamento
+FOR EACH ROW
+BEGIN
+    DECLARE email_creatore VARCHAR(255);
+    DECLARE numeratore INT DEFAULT 0;
+    DECLARE denominatore INT DEFAULT 0;
+
+    -- Trova l'email del creatore del progetto finanziato
+    SELECT P.email_creatore INTO email_creatore
+    FROM Progetto P
+    WHERE P.nome = NEW.nome_progetto;
+
+    -- Conta i progetti del creatore che hanno almeno un finanziamento
+    SELECT COUNT(DISTINCT P.nome)
+    INTO numeratore
+    FROM Progetto P
+    WHERE P.email_creatore = email_creatore
+    AND EXISTS (
+        SELECT 1 FROM Finanziamento F WHERE F.nome_progetto = P.nome
+    );
+
+    -- Conta il numero totale di progetti del creatore
+    SELECT COUNT(*)
+    INTO denominatore
+    FROM Progetto
+    WHERE email_creatore = email_creatore;
+
+    -- Aggiorna l'affidabilità
+    UPDATE Creatore
+    SET affidabilita = IF(denominatore = 0, 0, ROUND((numeratore / denominatore) * 100))
+    WHERE email_utente = email_creatore;
+END$$
+
+DELIMITER ;
+
+
 
 DELIMITER $$
 
@@ -224,19 +318,6 @@ BEGIN
     VALUES (p_nome);
 END $$
 
-CREATE PROCEDURE AggiungiSkillProgettoSoftware(
-    IN p_nome VARCHAR(255),
-    IN s_nome VARCHAR(255),
-    IN s_livello INT
-)
-BEGIN
-    -- Inserisce il progetto nella tabella Progetto
-    INSERT INTO ProgettoSkill (nome_progetto, nome_skill, livello)
-    VALUES (p_nome, s_nome, s_livello);
-END $$
-
-
-
 DELIMITER ;
 
 
@@ -262,7 +343,7 @@ BEGIN
         VALUES (p_email_utente, p_nome_progetto, p_importo, p_data, p_codice_reward);
     ELSE
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Il progetto � chiuso e non pu� essere finanziato.';
+        SET MESSAGE_TEXT = 'Il progetto è chiuso e non può essere finanziato.';
     END IF;
 END $$
 
@@ -498,10 +579,10 @@ BEGIN
             INSERT INTO Amministratore (email_utente, codice_sicurezza)
             VALUES (p_email, p_codice_sicurezza);
         ELSE
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utente è già un amministratore';
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Utente è già un amministratore';
         END IF;
     ELSE
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utente non esiste';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Utente non esiste';
     END IF;
 END $$
 
@@ -535,3 +616,37 @@ FROM Progetto P
 LEFT JOIN Finanziamento F ON P.nome = F.nome_progetto
 WHERE P.stato = "aperto"
 GROUP BY P.nome, P.descrizione, P.budget;
+
+-- Implementazione viste per visualizzare le statistiche
+
+CREATE VIEW View_top_creators AS
+SELECT 
+    U.nickname
+FROM Creatore C
+JOIN Utente U ON C.email_utente = U.email
+ORDER BY C.affidabilita DESC
+LIMIT 3;
+
+CREATE VIEW View_progetti_vicini_completamento AS
+SELECT 
+    P.nome AS NomeProgetto,
+    P.descrizione AS Descrizione,
+    P.budget AS Budget,
+    COALESCE(SUM(F.importo), 0) AS TotaleFinanziato,
+    (P.budget - COALESCE(SUM(F.importo), 0)) AS Differenza
+FROM Progetto P
+LEFT JOIN Finanziamento F ON P.nome = F.nome_progetto
+WHERE P.stato = 'aperto'
+GROUP BY P.nome, P.descrizione, P.budget
+ORDER BY Differenza ASC
+LIMIT 3;
+
+CREATE VIEW View_top_funders AS
+SELECT 
+    U.nickname,
+    COALESCE(SUM(F.importo), 0) AS TotaleFinanziato
+FROM Utente U
+JOIN Finanziamento F ON U.email = F.email_utente
+GROUP BY U.nickname
+ORDER BY TotaleFinanziato DESC
+LIMIT 3;
