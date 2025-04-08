@@ -28,7 +28,7 @@
                 <li>
                  <a href="<?php echo isset($_SESSION['email']) ? 'Frontend/creator/creator.html' : 'Frontend/login/login.html'; ?>">Crea un progetto</a>
                 </li>
-                <li><a href="#">Categorie</a></li>
+                <li><a href="Frontend/rankings/rankings.HTML">Classifiche</a></li>
                 <li><a href="Frontend/skills/skills.php">Skills</a></li>
                 <li><a href="#">Contatti</a></li>
             </ul>

@@ -621,7 +621,8 @@ GROUP BY P.nome, P.descrizione, P.budget;
 
 CREATE VIEW View_top_creators AS
 SELECT 
-    U.nickname
+    U.nickname,
+    C.affidabilita
 FROM Creatore C
 JOIN Utente U ON C.email_utente = U.email
 ORDER BY C.affidabilita DESC
