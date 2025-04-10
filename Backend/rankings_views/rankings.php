@@ -22,13 +22,12 @@ try {
     $projectsNearCompletion = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $rankings["near_completion"] = $projectsNearCompletion;
 
-    // Query per la view View_top_funders
+    // Query for View_top_funders
     $stmt = $conn->prepare("SELECT nickname, TotaleFinanziato FROM View_top_funders");
     $stmt->execute();
     $topFunders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $rankings["top_funders"] = $topFunders;
 
-    // Restituisci i risultati in formato JSON
     echo json_encode(["success" => true, "rankings" => $rankings]);
 
 } catch (PDOException $e) {

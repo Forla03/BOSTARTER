@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../config.php'; 
+require '../log_helper.php';
 
 header('Content-Type: application/json');
 
@@ -25,6 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['email'])) {
         $stmt->bindParam(':nome_profilo', $nome_profilo, PDO::PARAM_STR);
 
         $stmt->execute();
+
+        saveLog($mongoDb, "New application sent for project $nome_progetto by $email", "Application");
 
         echo json_encode(["success" => true, "message" => "Candidatura inviata con successo."]);
     } catch (PDOException $e) {

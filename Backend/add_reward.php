@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'config.php';
+require 'log_helper.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
@@ -43,18 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->closeCursor();
         $conn->commit();
 
-        // Log on MongoDB
-        try {
-            $logCollection = $mongoDb->selectCollection("logs_db");
-            $logEntry = [
-                'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
-                'message' => 'New reward created',
-                'type' => 'Reward creation',
-            ];
-            $logCollection->insertOne($logEntry);
-        } catch (Exception $mongoError) {
-            error_log("Errore MongoDB: " . $mongoError->getMessage());
-        }
+        saveLog($mongoDb, "New reward added for project $nome_progetto", "Reward");
 
         echo json_encode(['success' => true]);
 

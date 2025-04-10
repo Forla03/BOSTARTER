@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../config.php'; 
+require '../log_helper.php'; 
 
 header('Content-Type: application/json');
 
@@ -33,6 +34,8 @@ try {
     $stmt->bindValue(3,$date, PDO::PARAM_STR);
     $stmt->bindValue(4,$text, PDO::PARAM_STR);
     $stmt->execute();
+
+    saveLog($mongoDb, "New comment added to $name by $email", "Comment");
 
     echo json_encode(["success" => true, "username" => $_SESSION['nickname']]);
 } catch (PDOException $e) {

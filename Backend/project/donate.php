@@ -1,5 +1,6 @@
 <?php
 require '../config.php';
+require '../log_helper.php';
 session_start();
 try {
     $conn->beginTransaction();
@@ -32,18 +33,7 @@ try {
         "message" => "Donation successful",
     ]);
 
-    // Save log on MongoDB
-    $logCollection = $mongoDb->selectCollection("logs_db");
-    try {
-        $logEntry = [
-            'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
-            'message' => 'New donation to project: ' . $nome_progetto,
-            'type' => 'Donation',
-        ];
-        $logCollection->insertOne($logEntry);
-    } catch (Exception $e) {
-        error_log("Errore nel salvataggio del log MongoDB: " . $e->getMessage());
-    }
+   saveLog($mongoDb, "Donation of $importo made to project $nome_progetto by user $email", "Donation");
 
 } catch (Exception $e) {
     $conn->rollBack();

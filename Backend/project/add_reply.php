@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../config.php'; 
+require '../log_helper.php';
 
 header('Content-Type: application/json');
 
@@ -28,6 +29,8 @@ $testo = $data['testo'];
 try {
     $stmt = $conn->prepare("CALL InserisciRispostaCommento(?, ?, ?)");
     $stmt->execute([$id_commento, $email, $testo]);
+
+    saveLog($mongoDb, "New reply added to comment ID $id_commento by $email", "Reply");
 
     echo json_encode(["success" => true, "username" => $_SESSION['nickname']]);
 } catch (PDOException $e) {

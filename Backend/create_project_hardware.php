@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'config.php';
+require 'log_helper.php';
 
 header('Content-Type: application/json');
 
@@ -97,18 +98,7 @@ try {
         "uploaded_files" => !empty($_FILES['immagini']) ? count($_FILES['immagini']['name']) : 0
     ]);
 
-    $logCollection = $mongoDb->selectCollection("logs_db");
-
-        try {
-            $logEntry = [
-                'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
-                'message' => 'New hardware project created: ' . $name,
-                'type' => 'Creation',
-            ];
-            $logCollection->insertOne($logEntry);
-        } catch (Exception $e) {
-            error_log("Errore nel salvataggio del log MongoDB: " . $e->getMessage());
-        }
+    saveLog($mongoDb, "New hardware project created: $name by $creator_email", "Hardware Project Creation");
 
 } catch (Exception $e) {
     $conn->rollBack();

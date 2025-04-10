@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../config.php'; 
+require '../log_helper.php'; 
 
 header('Content-Type: application/json');
 
@@ -28,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
 
         $stmt->execute();
+
+        saveLog($mongoDb, "New applicant accepted: $email_utente", "Application");
 
         echo json_encode(["success" => true, "message" => "Candidatura accettata con successo."]);
 
