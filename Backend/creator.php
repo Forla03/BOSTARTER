@@ -14,7 +14,7 @@ if ($is_creator) {
     $creatorData = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($creatorData) {
-        // Se l'utente è un creatore, restituisci i suoi dati
+        // Se l'utente Ã¨ un creatore, restituisci i suoi dati
         $response = [
             'status' => 'creator',
             'nr_progetti' => $creatorData['nr_progetti'],
@@ -25,7 +25,7 @@ if ($is_creator) {
         $response = ['status' => 'not_creator'];
     }
 } else {
-    // Se l'utente non è un creatore, mostra il modulo di richiesta
+    // Se l'utente non Ã¨ un creatore, mostra il modulo di richiesta
     $response = ['status' => 'not_creator'];
 }
 

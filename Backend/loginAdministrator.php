@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'config.php'; // Connessione al database
+require 'config.php'; // Connection to the database
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $securityCode = $_POST["securityCode"];
 
     try {
-        // Controlla se l'utente esiste come amministratore
+        // Check if the user is an administrator
         $stmt = $conn->prepare("
             SELECT Utente.*, Amministratore.codice_sicurezza
             FROM Utente
@@ -25,19 +25,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Login riuscito
                     $_SESSION["email"] = $utente["email"];
                     $_SESSION["nickname"] = $utente["nickname"];
-                    $_SESSION["is_admin"] = true; // Salva il ruolo di amministratore
+                    $_SESSION["is_admin"] = true; //Save the admin status
 
-                    // Controlla se l'utente � un creator
+                    // Check if the user is a creator
                     $sql = "SELECT * FROM Creatore WHERE email_utente = :email";
                     $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":email", $email);
                     $stmt->execute();
                     $creatore = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Se esiste nella tabella Creatore, � un creator
                     $_SESSION["is_creator"] = $creatore ? true : false;
 
-                    header("Location: /index.php"); // Reindirizza alla home
+                    header("Location: /index.php"); 
                     exit();
                 } else {
                     echo "Codice di sicurezza errato.";
@@ -46,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "Password errata.";
             }
         } else {
-            echo "Email non trovata o non � un amministratore.";
+            echo "Email non trovata o non è un amministratore.";
         }
     } catch (PDOException $e) {
         echo "Errore nel login: " . $e->getMessage();

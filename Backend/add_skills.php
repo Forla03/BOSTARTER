@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'config.php'; 
+require 'log_helper.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $skill_name = $_POST["skill_name"];
@@ -15,14 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":skill_level", $skill_level);
         $stmt->execute();
 
-        $logCollection = $mongoDb->selectCollection("logs_db");
-
-        $logEntry = [
-            'timestamp' => new MongoDB\BSON\UTCDateTime((int) (microtime(true) * 1000)),
-            'message' => 'New skill created:' .$skill_name. ', the level is '  . $skill_level,
-            'type' => 'Skill creation',
-        ];
-        $logCollection->insertOne($logEntry);
+        saveLog($mongoDb, "New skill added: $skill_name", "Skill");
 
         // Redirect to the add_skill page
         header('Location: ../Frontend/skills/add_skill.html');

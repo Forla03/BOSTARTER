@@ -163,7 +163,6 @@ DROP TRIGGER IF EXISTS AggiornaAffidabilitaDopoFinanziamento;
 
 DROP PROCEDURE IF EXISTS AggiungiProgettoHardware;
 DROP PROCEDURE IF EXISTS AggiungiProgettoSoftware;
-DROP PROCEDURE IF EXISTS AggiungiSkillProgettoSoftware;
 DROP PROCEDURE IF EXISTS FinanziaProgetto;
 DROP PROCEDURE IF EXISTS VisualizzaProgettiDisponibili;
 DROP PROCEDURE IF EXISTS ScegliReward;

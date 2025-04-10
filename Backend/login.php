@@ -1,13 +1,12 @@
 <?php
 session_start();
-require 'config.php'; // Connessione al database
+require 'config.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $password = $_POST["password"];
 
     try {
-        // Controlla se l'utente esiste
         $stmt = $conn->prepare("SELECT * FROM Utente WHERE email = :email");
         $stmt->bindParam(":email", $email);
         $stmt->execute();
@@ -17,17 +16,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["email"] = $utente["email"];
             $_SESSION["nickname"] = $utente["nickname"];
 
-            // Controlla se l'utente � un creator
+            // Check if the user is a creator
             $sql = "SELECT * FROM Creatore WHERE email_utente = :email";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(":email", $email);
             $stmt->execute();
             $creatore = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Se esiste nella tabella Creatore, � un creator
             $_SESSION["is_creator"] = $creatore ? true : false;
 
-            header("Location: /index.php"); // Reindirizza alla home
+            header("Location: /index.php"); // Redirect to the home
             exit();
         } else {
             echo "Email o password errati.";
