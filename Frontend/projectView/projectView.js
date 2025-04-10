@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const projectType = urlParams.get('tipoProgetto');
     url = "../../Backend/project/get_projectData.php";
     var profilesData = null; 
+    var projectImages = null;
 
     //Get user email
     const userEmailRequest = await fetch("../../Backend/session.php") ?? null;
@@ -33,6 +34,21 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+    // Get project images if any
+    try {
+        const projectImagesRequest = await fetch("../../Backend/project/get_projectImages.php", {
+            method: "POST",
+            body: JSON.stringify({ nome_progetto: projectName }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        projectImages = await projectImagesRequest.json();
+    } catch (error) {
+        console.error("Errore nel recupero delle immagini del progetto:", error);
+        displayError("Errore nel caricamento delle immagini del progetto.");
+    }
+
     fetch(url, {
         method: "POST",
         headers: {
@@ -43,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            renderProjectData(data, projectType, profilesData, userEmail);
+            renderProjectData(data, projectType, profilesData, userEmail, projectImages);
         } else {
             console.error("Errore nel recupero dati:", data.message);
             displayError(data.message);
@@ -56,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 
-function renderProjectData(data, projectType, profilesData, userEmail) {
+function renderProjectData(data, projectType, profilesData, userEmail, projectImages) {
     const container = document.getElementById("project-container");
     if (!container) {
         console.error("Elemento project-container non trovato");
@@ -71,7 +87,7 @@ function renderProjectData(data, projectType, profilesData, userEmail) {
     projectInfo.classList.add('project-info');
     
     const percentualeFinanziamento = Math.min(
-        Math.round((data.progetto.totale_finanziato / data.progetto.fondi_totali) * 100), 
+        Math.round((data.progetto.totale_finanziato / data.progetto.budget) * 100), 
         100
     );
 
@@ -97,6 +113,30 @@ function renderProjectData(data, projectType, profilesData, userEmail) {
         </div>
     `;
     container.appendChild(projectInfo);
+
+    // Project images section
+    if (projectImages && projectImages.images && projectImages.images.length > 0) {
+        const imageSection = document.createElement("div");
+        imageSection.classList.add("project-images-section");
+    
+        const imageTitle = document.createElement("h2");
+        imageTitle.textContent = "Galleria Immagini";
+        imageSection.appendChild(imageTitle);
+    
+        const imageSlider = document.createElement("div");
+        imageSlider.classList.add("image-slider");
+    
+        projectImages.images.forEach(base64Str => {
+            const img = document.createElement("img");
+            img.src = `data:image/jpeg;base64,${base64Str}`;
+            img.alt = "Immagine progetto";
+            img.classList.add("slider-image");
+            imageSlider.appendChild(img);
+        });
+    
+        imageSection.appendChild(imageSlider);
+        container.appendChild(imageSection);
+    }
 
     if (profilesData) {
         // Profiles section

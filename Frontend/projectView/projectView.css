@@ -41,11 +41,48 @@ header {
     letter-spacing: -0.5px;
 }
 
+#external-link-container {
+    width: 10%;
+    height: 10vh;
+    background-color: #ffffff;
+    padding: 2rem 1rem;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    margin: 0 auto;
+    float: left;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1rem;
+    border-radius: var(--radius);
+}
+
+
+.back-to-projects {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 15px;
+    background-color: #b92727;
+    color: #fff; 
+    text-decoration: none; 
+    border-radius: 5px; 
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.back-to-projects:hover {
+    background-color: #ad0000; 
+}
+
 .main-container, #project-container {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
+
+
 
 .project-info, .rewards-section, .comments-section {
     background: var(--white);
@@ -127,6 +164,56 @@ header {
     gap: 2rem;
     margin-top: 1rem;
     flex-wrap: wrap;
+}
+
+.project-images-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.project-images-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+.image-slider {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+    scroll-behavior: smooth;
+}
+
+.image-slider::-webkit-scrollbar {
+    height: 8px;
+}
+
+.image-slider::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: var(--radius);
+}
+
+.image-slider::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+.slider-image {
+    max-width: 200px;
+    height: auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform var(--transition), box-shadow var(--transition);
+    cursor: pointer;
+}
+
+.slider-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .rewards-list {
