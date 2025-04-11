@@ -127,3 +127,80 @@ h1 {
 #go_home:hover {
     background: #0056b3;
 }
+
+/* Project Section Improvements */
+.projects-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 25px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.projects-container h3 {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.scroll-container {
+    display: flex;
+    gap: 20px;
+    padding: 10px 0;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+}
+
+.project {
+    flex: 0 0 280px;
+    background: #f8f9fa;
+    padding: 18px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.project:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.project-name {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin: 0 0 12px 0;
+    font-weight: 600;
+}
+
+.project-budget {
+    color: #27ae60;
+    font-size: 0.95rem;
+    margin: 8px 0;
+    font-weight: 500;
+}
+
+.project-deadline {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin: 8px 0 0 0;
+    font-style: italic;
+}
+
+/* Custom Scrollbar */
+.scroll-container::-webkit-scrollbar {
+    height: 8px;
+    background-color: #f8f9fa;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+

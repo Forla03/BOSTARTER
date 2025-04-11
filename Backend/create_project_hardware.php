@@ -32,6 +32,7 @@ try {
 
     $conn->beginTransaction();
 
+    // Inserisce il progetto hardware
     $stmt = $conn->prepare("CALL AggiungiProgettoHardware(:name, :description, :start_date, :budget, :final_date, :creator_email)");
     $stmt->bindParam(":name", $name);
     $stmt->bindParam(":description", $description);
@@ -45,8 +46,11 @@ try {
     }
     $stmt->closeCursor();
 
+    // Inserisce i componenti e calcola il costo totale
     $stmtComp = $conn->prepare("INSERT INTO ProgettoComponente (nome_progetto, nome_componente, quantita, descrizione, prezzo) 
                                VALUES (:project_name, :component_name, :quantity, :description, :price)");
+
+    $totalComponentsCost = 0;
 
     foreach ($components as $component) {
         if (!isset($component['nome_componente'], $component['quantita'], $component['descrizione'], $component['prezzo'])) {
@@ -60,6 +64,8 @@ try {
             throw new Exception("Quantity and price must be greater than zero.");
         }
 
+        $totalComponentsCost += $quantity * $price;
+
         $stmtComp->execute([
             ':project_name' => $name,
             ':component_name' => $component['nome_componente'],
@@ -69,7 +75,12 @@ try {
         ]);
     }
 
-    // Insert images if any
+    // Verifica che il costo totale dei componenti corrisponda al budget
+    if ($totalComponentsCost != $budget) {
+        throw new Exception("The total cost of components ($totalComponentsCost) does not match the budget ($budget).");
+    }
+
+    // Inserisce le immagini, se presenti
     if (!empty($_FILES['immagini'])) {
         $stmtImg = $conn->prepare("INSERT INTO FotoProgetto (nome_progetto, foto) VALUES (?, ?)");
         
@@ -78,7 +89,7 @@ try {
                 throw new Exception("Error uploading file: " . $_FILES['immagini']['name'][$key]);
             }
 
-            // Modify here to allow only images
+            // Consenti solo immagini
             $mimeType = mime_content_type($tmpName);
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
             
