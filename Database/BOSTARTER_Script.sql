@@ -19,27 +19,26 @@ CREATE TABLE IF NOT EXISTS CurriculumSkill (
 );
 
 CREATE TABLE IF NOT EXISTS Possedimento (
-    emailUtente VARCHAR(100),
+    emailUtente VARCHAR(255),
     skill VARCHAR(100),
     livello_skill INT,
     PRIMARY KEY (emailUtente, skill, livello_skill),
-    FOREIGN KEY (emailUtente) REFERENCES Utente(email),
-    FOREIGN KEY (skill, livello_skill) REFERENCES CurriculumSkill(nome_skill, livello)
+    FOREIGN KEY (emailUtente) REFERENCES Utente(email) ON DELETE CASCADE,
+    FOREIGN KEY (skill, livello_skill) REFERENCES CurriculumSkill(nome_skill, livello) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Amministratore (
     email_utente VARCHAR(255) PRIMARY KEY,
     codice_sicurezza CHAR(5) NOT NULL,
-    FOREIGN KEY (email_utente) REFERENCES Utente(email)
+    FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Creatore (
     email_utente VARCHAR(255) PRIMARY KEY,
     nr_progetti INT DEFAULT 0,
     affidabilita INT DEFAULT 0 CHECK (affidabilita >= 0),
-    FOREIGN KEY (email_utente) REFERENCES Utente(email)
+    FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS Progetto (
     nome VARCHAR(255) PRIMARY KEY,
@@ -50,7 +49,7 @@ CREATE TABLE IF NOT EXISTS Progetto (
     stato ENUM('aperto', 'chiuso') NOT NULL DEFAULT 'aperto',
     email_creatore VARCHAR(255) NOT NULL,
     CHECK(data_limite > data_inserimento),
-    FOREIGN KEY (email_creatore) REFERENCES Creatore(email_utente)
+    FOREIGN KEY (email_creatore) REFERENCES Creatore(email_utente) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS FotoProgetto (
@@ -75,9 +74,9 @@ CREATE TABLE IF NOT EXISTS Finanziamento (
     data DATE NOT NULL,
     codice_reward INT NOT NULL,
     PRIMARY KEY (email_utente, nome_progetto, data),
-    FOREIGN KEY (email_utente) REFERENCES Utente(email),
-    FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome),
-    FOREIGN KEY (codice_reward) REFERENCES Reward(codice)
+    FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE,
+    FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE,
+    FOREIGN KEY (codice_reward) REFERENCES Reward(codice) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Commento (
@@ -86,8 +85,8 @@ CREATE TABLE IF NOT EXISTS Commento (
     nome_progetto VARCHAR(255) NOT NULL,
     data DATE NOT NULL,
     testo TEXT NOT NULL,
-    FOREIGN KEY (email_utente) REFERENCES Utente(email),
-    FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome)
+    FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE,
+    FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS RispostaCommento (
@@ -103,7 +102,6 @@ CREATE TABLE IF NOT EXISTS ProgettoHardware (
     FOREIGN KEY (nome_progetto) REFERENCES Progetto(nome) ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS ProgettoComponente (
     nome_progetto VARCHAR(255),
     nome_componente VARCHAR(100),
@@ -113,7 +111,6 @@ CREATE TABLE IF NOT EXISTS ProgettoComponente (
     PRIMARY KEY (nome_progetto, nome_componente),
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoHardware(nome_progetto) ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS ProgettoSoftware (
     nome_progetto VARCHAR(255) PRIMARY KEY,
@@ -126,7 +123,6 @@ CREATE TABLE IF NOT EXISTS ProgettoProfilo (
     PRIMARY KEY (nome_progetto, nome_profilo),
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS SkillsProfilo (
     nome_profilo VARCHAR(100) NOT NULL,
@@ -148,6 +144,7 @@ CREATE TABLE IF NOT EXISTS Candidatura (
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE,
     FOREIGN KEY (nome_progetto, nome_profilo) REFERENCES ProgettoProfilo(nome_progetto, nome_profilo)
 );
+
 
 CREATE EVENT IF NOT EXISTS ChiudiProgettiScaduti
 ON SCHEDULE EVERY 1 DAY
