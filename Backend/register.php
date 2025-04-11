@@ -12,6 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $anno_nascita = $_POST["anno_nascita"];
     $luogo_nascita = $_POST["luogo_nascita"];
     $isCreator = isset($_POST["creator"]) ? 1 : 0; // Check if the checkbox is checked
+    $isAdmin = isset($_POST["admin"]) ? 1 : 0;
+    $adminCode = $_POST["adminCode"] ?? null; // Get the admin code if provided
     if ($password !== $confirmPassword) {
         die("Le password non coincidono.");
     }
@@ -40,6 +42,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmtCreator->execute();
 
             saveLog($mongoDb, "New creator registered: $email", "Registration");
+        }
+
+        // If the user wants to be an admin, insert into Amministratore table
+        if ($isAdmin) {
+            $stmtAdmin = $conn->prepare("CALL AggiungiAmministratore(:email, :adminCode)");
+            $stmtAdmin->bindParam(":email", $email);
+            $stmtAdmin->bindParam(":adminCode", $adminCode);
+            $stmtAdmin->execute();
+
+            saveLog($mongoDb, "New admin registered: $email", "Registration");
         }
 
         // Redirect to login page

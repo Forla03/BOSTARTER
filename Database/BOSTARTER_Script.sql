@@ -278,6 +278,46 @@ DELIMITER ;
 
 DELIMITER $$
 
+CREATE PROCEDURE GetSoftwareProjects(
+    IN p_email_utente VARCHAR(255)
+)
+BEGIN
+    -- Retrieve all software projects for the given user
+    SELECT 
+        P.nome AS NomeProgetto,
+        P.descrizione AS Descrizione,
+        P.budget AS Budget,
+        P.data_inserimento AS DataInserimento,
+        P.data_limite AS DataLimite
+    FROM Progetto P
+    JOIN ProgettoSoftware PS ON P.nome = PS.nome_progetto
+    WHERE P.email_creatore = p_email_utente;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetHardwareProjects(
+    IN p_email_utente VARCHAR(255)
+)
+BEGIN
+    -- Retrieve all hardware projects for the given user
+    SELECT 
+        P.nome AS NomeProgetto,
+        P.descrizione AS Descrizione,
+        P.budget AS Budget,
+        P.data_inserimento AS DataInserimento,
+        P.data_limite AS DataLimite
+    FROM Progetto P
+    JOIN ProgettoHardware PH ON P.nome = PH.nome_progetto
+    WHERE P.email_creatore = p_email_utente;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE PROCEDURE AggiungiProgettoHardware(
     IN p_nome VARCHAR(255),
     IN p_descrizione TEXT,

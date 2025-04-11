@@ -43,6 +43,56 @@ document.addEventListener("DOMContentLoaded", function () {
                     skillsContainer.innerHTML = "<p>Nessuna skill registrata.</p>";
                 }
 
+               // Display projects if available
+               if (data.projects) {
+                const container = document.querySelector(".container");
+                const createProjectSection = (projects, title) => {
+                    if (!projects || projects.length === 0) return;
+
+                    const section = document.createElement("div");
+                    section.className = "projects-container";
+                    
+                    const titleElement = document.createElement("h3");
+                    titleElement.textContent = title;
+                    
+                    const scrollContainer = document.createElement("div");
+                    scrollContainer.className = "scroll-container";
+
+                    projects.forEach(project => {
+                        const projectElement = document.createElement("div");
+                        projectElement.className = "project";
+                        
+                        // Project Name
+                        const name = document.createElement("h4");
+                        name.className = "project-name";
+                        name.textContent = project.NomeProgetto;
+                        
+                        // Project Budget
+                        const budget = document.createElement("p");
+                        budget.className = "project-budget";
+                        budget.textContent = `Budget: €${project.Budget.toLocaleString('it-IT')}`;
+                        
+                        // Project Deadline
+                        const deadline = document.createElement("p");
+                        deadline.className = "project-deadline";
+                        const date = new Date(project.DataLimite);
+                        deadline.textContent = `Scadenza: ${date.toLocaleDateString('it-IT', {
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric'
+                        })}`;
+
+                        projectElement.append(name, budget, deadline);
+                        scrollContainer.appendChild(projectElement);
+                    });
+
+                    section.append(titleElement, scrollContainer);
+                    container.appendChild(section);
+                };
+
+                createProjectSection(data.projects.software, "Progetti Software");
+                createProjectSection(data.projects.hardware, "Progetti Hardware");         
+        }
             } else {
                 document.body.innerHTML = "<h2>Utente non trovato</h2>";
             }

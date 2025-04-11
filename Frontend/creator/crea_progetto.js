@@ -274,19 +274,25 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
                 body: formData 
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
             const data = await response.json();
 
-            const rewardResponse = (await postRewards(getRewards(), form.querySelector('#nome').value));
+            if (!data.success) {
+                // Specific error handling based on the message returned from the server
+                if (data.message.includes("The total cost of components")) {
+                    alert("Errore: Il costo totale dei componenti non corrisponde al budget specificato. Verifica i dati inseriti.");
+                } else {
+                    throw new Error(data.message || "Errore sconosciuto");
+                }
+                return;
+            }
 
-            if (data.success && rewardResponse.success) {
+            const rewardResponse = await postRewards(getRewards(), form.querySelector('#nome').value);
+
+            if (rewardResponse.success) {
                 form.reset();
                 document.getElementById("lista-componenti").innerHTML = "";
             } else {
-                throw new Error(data.message || "Errore sconosciuto");
+                throw new Error("Errore durante l'inserimento delle ricompense.");
             }
         } catch (error) {
             console.error("Errore:", error);
