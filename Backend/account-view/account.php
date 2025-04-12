@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'config.php'; // Connection to the database
+require '../config.php'; // Connection to the database
 
 try {
     // Query used to get user information from a view

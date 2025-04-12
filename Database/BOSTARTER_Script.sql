@@ -170,6 +170,10 @@ DROP PROCEDURE IF EXISTS RifiutaRichiestaCreatore;
 DROP PROCEDURE IF EXISTS AggiungiAmministratore;
 DROP PROCEDURE IF EXISTS AccettaCandidatura;
 DROP PROCEDURE IF EXISTS InserisciRispostaCommento;
+DROP PROCEDURE IF EXISTS GetSoftwareProjects;
+DROP PROCEDURE IF EXISTS GetHardwareProjects;
+DROP PROCEDURE IF EXISTS GetUserRewards;
+DROP PROCEDURE IF EXISTS GetUserApplications;
 
 DROP VIEW IF EXISTS View_user_features;
 DROP VIEW IF EXISTS View_general_project;
@@ -312,6 +316,46 @@ BEGIN
     FROM Progetto P
     JOIN ProgettoHardware PH ON P.nome = PH.nome_progetto
     WHERE P.email_creatore = p_email_utente;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetUserRewards(
+    IN p_email_utente VARCHAR(255)
+)
+BEGIN
+    -- Recupera i reward associati ai finanziamenti dell'utente
+    SELECT 
+        R.codice AS CodiceReward,
+        R.descrizione AS DescrizioneReward,
+        R.nome_progetto AS NomeProgetto,
+        R.foto AS FotoReward,
+        P.descrizione AS DescrizioneProgetto,
+        F.importo AS ImportoFinanziato,
+        F.data AS DataFinanziamento
+    FROM Finanziamento F
+    JOIN Reward R ON F.codice_reward = R.codice
+    JOIN Progetto P ON R.nome_progetto = P.nome
+    WHERE F.email_utente = p_email_utente;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetUserApplications(
+    IN p_email_utente VARCHAR(255)
+)
+BEGIN
+    -- Recupera tutti i profili ricoperti dall'utente nelle candidature accettate
+    SELECT 
+        C.nome_progetto AS NomeProgetto,
+        C.nome_profilo AS NomeProfilo
+    FROM Candidatura C
+    WHERE C.email_utente = p_email_utente
+      AND C.accettata = 1;
 END $$
 
 DELIMITER ;

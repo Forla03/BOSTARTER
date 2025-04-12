@@ -8,7 +8,14 @@
     <link rel="stylesheet" href="account.css"/>
 </head>
 <body>
-    <button id="go_home" onclick="window.location.href='../../index.php'">Home</button>
+    <div class="sidebar">
+        <button id="go_home" onclick="window.location.href='../../index.php'">Home</button>
+        <button id="starting_view_button">Overview e skills</button>
+        <button id="show_projects">I tuoi progetti</button>
+        <button id="collaborate_projects">Progetti a cui collabori</button>
+        <button id="rewards">Le tue ricompense</button>
+        <button id="logout" onclick="window.location.href='../../Backend/logout.php'">Logout</button>
+    </div>
     <div class="container">
         <h1 id="nickname">Caricamento...</h1>
 
@@ -24,8 +31,6 @@
             <h3>Skill</h3>
             <div id="skills"></div>
         </div>
-        
-        <button id="logout" onclick="window.location.href='../../Backend/logout.php'">Logout</button>
     </div>
 
 </body>
