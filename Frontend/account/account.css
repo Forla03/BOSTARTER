@@ -5,27 +5,57 @@ body {
     padding: 0;
     background-color: #f8f9fa;
     color: #333;
+    display: flex; 
+}
+
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    background-color: #343a40;
+    padding: 20px;
+    min-height: 100vh; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar button {
+    background: #007bff;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+
+.sidebar button:hover {
+    background: #0056b3;
 }
 
 /* Main container */
 .container {
-    max-width: 600px;
+    flex: 1; /* Occupa lo spazio rimanente */
+    max-width: 800px;
     margin: 50px auto;
     background: white;
-    padding: 20px;
+    padding: 30px;
     border-radius: 10px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
-/*  Nickname */
+/* Nickname */
 h1 {
     color: #007bff;
     font-size: 28px;
     margin-bottom: 20px;
 }
 
-/* personal informations */
+/* Personal informations */
 .info {
     text-align: left;
     margin-bottom: 20px;
@@ -36,14 +66,16 @@ h1 {
     line-height: 1.5;
 }
 
-/* skill container*/
+/* Skills container */
 .skills-container {
     text-align: left;
     background: #e9ecef;
     padding: 15px;
     border-radius: 8px;
-    max-height: 150px; 
-    overflow-y: auto; 
+    max-height: 150px;
+    overflow-y: auto;
+    height: 40vh;
+    max-height: 40vh;
 }
 
 .skills-container h3 {
@@ -51,7 +83,7 @@ h1 {
     margin-bottom: 10px;
 }
 
-/* skill style */
+/* Skill style */
 .skill {
     background: #007bff;
     color: white;
@@ -73,10 +105,9 @@ h1 {
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-
-/*delete buttons */
+/* Delete buttons */
 .delete {
-    background: #dc3545; 
+    background: #dc3545;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -88,44 +119,7 @@ h1 {
 }
 
 .delete:hover {
-    background: #c82333; 
-}
-
-/* logout button*/
-#logout {
-    display: block;
-    width: 100%;
-    background: #007bff;
-    color: white;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-}
-
-#logout:hover {
-    background: #0056b3;
-}
-
-/* home button */
-#go_home{
-    display: block;
-    width: 10%;
-    background: #007bff;
-    color: white;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    margin-left: 20px;
-}
-
-#go_home:hover {
-    background: #0056b3;
+    background: #c82333;
 }
 
 /* Project Section Improvements */
@@ -204,3 +198,60 @@ h1 {
     background: #0056b3;
 }
 
+.carousel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.carousel-container {
+    display: flex;
+    overflow: hidden;
+    width: 80%;
+    justify-content: center;
+}
+
+.reward {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.reward img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+}
+
+.carousel-arrow {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 50%;
+}
+
+.carousel-arrow:hover {
+    background-color: #0056b3;
+}
+
+.scrollable-container {
+    max-height: 400px;
+    overflow-y: auto; 
+    border: 1px solid #ccc; 
+    padding: 10px;
+}
+
+.application {
+    margin-bottom: 10px; 
+    padding: 10px;
+    border: 1px solid #ddd; 
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
