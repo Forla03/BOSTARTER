@@ -30,7 +30,7 @@
                 </li>
                 <li><a href="Frontend/rankings/rankings.HTML">Classifiche</a></li>
                 <li><a href="Frontend/skills/skills.php">Skills</a></li>
-                <li><a href="#">Contatti</a></li>
+                <li><a href="Frontend/closedProjects/closed.HTML">Progetti chiusi</a></li>
             </ul>
         </nav>
         <button id="loginBtn">Accedi</button>
@@ -42,27 +42,10 @@
         <button class="cta" onclick="window.location.href= 'Frontend/general_projectsView/general.HTML'">Esplora i progetti</button>
     </section>
 
-    <section class="categories">
-        <h2>Scopri le categorie</h2>
-        <div class="category-list">
-            <div class="category">Progetti Hardware</div>
-            <div class="category">Progetti Software</div>
-        </div>
-    </section>
-
-    <section class="projects">
-        <h2>Progetti in evidenza</h2>
-        <div class="project-list">
-            <div class="project">
-                <img src="hardware.jpg" alt="Progetto Hardware">
-                <h3>Dispositivo IoT innovativo</h3>
-                <p>Un device smart per la casa con funzioni avanzate.</p>
-            </div>
-            <div class="project">
-                <img src="software.jpg" alt="Progetto Software">
-                <h3>App gestionale avanzata</h3>
-                <p>Un'app potente per organizzare il tuo lavoro.</p>
-            </div>
+    <section class="the_best">
+        <h2>In evidenza</h2>
+        <div class="best-list" id="bestList">
+            
         </div>
     </section>
 

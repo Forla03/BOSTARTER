@@ -145,6 +145,7 @@ CREATE TABLE IF NOT EXISTS Candidatura (
     FOREIGN KEY (nome_progetto, nome_profilo) REFERENCES ProgettoProfilo(nome_progetto, nome_profilo)
 );
 
+DROP EVENT IF EXISTS ChiudiProgettiScaduti;
 
 CREATE EVENT IF NOT EXISTS ChiudiProgettiScaduti
 ON SCHEDULE EVERY 1 DAY
