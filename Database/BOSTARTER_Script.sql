@@ -181,6 +181,7 @@ DROP VIEW IF EXISTS View_general_project;
 DROP VIEW IF EXISTS View_top_creators;
 DROP VIEW IF EXISTS View_progetti_vicini_completamento;
 DROP VIEW IF EXISTS View_top_funders;
+DROP VIEW IF EXISTS View_closed_projects;
 
 DELIMITER $$
 
@@ -697,6 +698,22 @@ FROM Progetto P
 LEFT JOIN Finanziamento F ON P.nome = F.nome_progetto
 WHERE P.stato = "aperto"
 GROUP BY P.nome, P.descrizione, P.budget;
+
+CREATE VIEW View_closed_projects AS
+SELECT 
+    P.nome AS NomeProgetto,
+    P.descrizione AS Descrizione,
+    P.data_limite AS DataLimite,
+    CASE 
+        WHEN EXISTS (SELECT 1 FROM ProgettoHardware PH WHERE PH.nome_progetto = P.nome) THEN 'Hardware'
+        WHEN EXISTS (SELECT 1 FROM ProgettoSoftware PS WHERE PS.nome_progetto = P.nome) THEN 'Software'
+        ELSE 'Altro'
+    END AS TipoProgetto,
+    COALESCE(SUM(F.importo), 0) >= P.budget AS FinanziatoCompletamente
+FROM Progetto P
+LEFT JOIN Finanziamento F ON P.nome = F.nome_progetto
+WHERE P.stato = 'chiuso'
+GROUP BY P.nome, P.descrizione, P.data_limite, P.budget;
 
 -- Implementazione viste per visualizzare le statistiche
 

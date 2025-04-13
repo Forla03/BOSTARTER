@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = document.querySelector(".container");
         container.innerHTML = `<h1>${titoloGenerale}</h1>`;
     
-        const aggiungiSezione = (projects, titolo) => {
+        const aggiungiSezione = (projects, titolo, tipo) => {
             if (!projects || projects.length === 0) return;
     
             const section = document.createElement("div");
@@ -146,6 +146,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     month: 'long',
                     year: 'numeric'
                 })}`;
+
+                projectElement.addEventListener("click", () => {
+                    window.location.href = `../projectView/projectView.html?nomeProgetto=${encodeURIComponent(project.NomeProgetto)}&tipoProgetto=${encodeURIComponent(tipo)}`;
+                });
     
                 projectElement.append(name, budget, deadline);
                 scrollContainer.appendChild(projectElement);
@@ -155,8 +159,8 @@ document.addEventListener("DOMContentLoaded", function () {
             container.appendChild(section);
         };
     
-        aggiungiSezione(projectData.software, "Progetti software");
-        aggiungiSezione(projectData.hardware, "Progetti hardware");
+        aggiungiSezione(projectData.software, "Progetti software", "Software");
+        aggiungiSezione(projectData.hardware, "Progetti hardware", "Hardware");
     
         if ((!projectData.software || projectData.software.length === 0) &&
             (!projectData.hardware || projectData.hardware.length === 0)) {

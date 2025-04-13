@@ -56,11 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }));
         }
 
+        // Check if the project is closed
+        $stmt = $conn->prepare("SELECT 1 FROM View_closed_projects WHERE NomeProgetto = :nome_progetto");
+        $stmt->bindParam(':nome_progetto', $nome_progetto, PDO::PARAM_STR);
+        $stmt->execute();
+        $isClosed = $stmt->fetch(PDO::FETCH_ASSOC) ? true : false;
 
         // Final data
         echo json_encode([
             "success" => true,
             "progetto" => $progetto,
+            "closed" => $isClosed,
             "commenti" => $commenti
         ]);
     } catch (PDOException $e) {
