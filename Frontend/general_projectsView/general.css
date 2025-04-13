@@ -113,3 +113,14 @@ a{
     border-radius: 20px;
     position: relative;
 }
+
+.status-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-icon {
+    width: 20px; 
+    height: 20px;
+}

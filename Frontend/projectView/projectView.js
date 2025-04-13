@@ -91,6 +91,12 @@ function renderProjectData(data, projectType, profilesData, userEmail, projectIm
         100
     );
 
+    const isClosed = data.closed;
+    if(isClosed) {
+        let backLink = document.querySelector(".back-to-projects");
+        backLink.href = `../../Frontend/closedProjects/closed.html`;
+    }
+
     projectInfo.innerHTML = `
         <h1 class="project-title">${data.progetto.nome}</h1>
         <p class="project-description">${data.progetto.descrizione}</p>
@@ -108,7 +114,7 @@ function renderProjectData(data, projectType, profilesData, userEmail, projectIm
             <div class="project-meta">
                 <span><strong>Categoria:</strong> ${projectType}</span>
                 <span><strong>Data scadenza:</strong> ${new Date(data.progetto.data_limite).toLocaleDateString()}</span>
-                <a href = "./contribute.html?nomeProgetto=${data.progetto.nome}" class="contribute-button">Contribuisci</a>
+                ${!isClosed ? `<a href="./contribute.html?nomeProgetto=${data.progetto.nome}" class="contribute-button">Contribuisci</a>` : ''}
             </div>
         </div>
     `;
