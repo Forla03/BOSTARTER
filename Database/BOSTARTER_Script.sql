@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS Amministratore (
 
 CREATE TABLE IF NOT EXISTS Creatore (
     email_utente VARCHAR(255) PRIMARY KEY,
-    nr_progetti INT DEFAULT 0,
     affidabilita INT DEFAULT 0 CHECK (affidabilita >= 0),
     FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE
 );
@@ -215,11 +214,6 @@ BEGIN
 
     DECLARE numeratore INT DEFAULT 0;
     DECLARE denominatore INT DEFAULT 0;
-
-    -- Incrementa il numero di progetti del creatore
-    UPDATE Creatore
-    SET nr_progetti = nr_progetti + 1
-    WHERE email_utente = NEW.email_creatore;
 
     -- Calcola i progetti con almeno un finanziamento (numeratore)
     SELECT COUNT(DISTINCT P.nome)
@@ -623,7 +617,7 @@ BEGIN
     -- Controllo se l'utente ha fatto richiesta
     IF EXISTS (SELECT 1 FROM Creatore_enrollement WHERE email_utente = email) THEN
         -- Inserisce l'utente nella tabella Creatore
-        INSERT INTO Creatore (email, nr_progetti, affidabilita) VALUES (email, 0, 0);
+        INSERT INTO Creatore (email, affidabilita) VALUES (email, 0);
         
         -- Rimuove la richiesta dalla tabella Creatore_enrollement
         DELETE FROM Creatore_enrollement WHERE email_utente = email;
