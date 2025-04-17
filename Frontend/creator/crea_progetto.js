@@ -1,4 +1,17 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {   
+    let data = await fetch("../../Backend/creator.php");
+    let json = await data.json();
+    if (json.status !== "creator") {
+        document.body.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center;">
+                <h1>Accesso Negato</h1>
+                <p>Devi essere un <strong>creator</strong> per accedere a questa pagina.</p>
+                <a href="../../index.php" style="margin-top: 20px; text-decoration: underline;">Torna alla Home</a>
+            </div>
+        `;
+        return; 
+    }
+    
     fetch("../../Backend/get_skill.php")
         .then(response => response.json())
         .then(data => {
