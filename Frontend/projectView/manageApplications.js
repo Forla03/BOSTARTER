@@ -34,7 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         <td>${c.email_utente}</td>
                         <td>${c.nome_progetto}</td>
                         <td>${c.nome_profilo}</td>
-                        <td><button class="accept-btn" data-email="${c.email_utente}">Accetta</button></td>
+                        <td><button class="accept-btn" data-email="${c.email_utente}">Accetta</button>
+                            <button class="reject-btn" data-email="${c.email_utente}">Rifiuta</button>
+                        </td>
                     `;
 
                     tableBody.appendChild(row);
@@ -44,6 +46,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     button.addEventListener("click", () => {
                         const email = button.dataset.email;
                         acceptCandidate(email);
+                    });
+                });
+
+                document.querySelectorAll(".reject-btn").forEach(button => {
+                    button.addEventListener("click", () => {
+                        const email = button.dataset.email;
+                        rejectCandidate(email);
                     });
                 });
 
@@ -62,6 +71,32 @@ document.addEventListener("DOMContentLoaded", () => {
     async function acceptCandidate(email) {
 
         fetch("../../Backend/project/accept_candidate.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email_utente: email,
+                nome_progetto: projectName,
+                nome_profilo: profileName
+            }),
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                loadCandidature(); // Reload tables without reloading the page
+            } else {
+                alert(data.message || "Errore durante l'accettazione.");
+            }
+        })
+        .catch(err => {
+            console.error("Errore nella richiesta di accettazione:", err);
+        });
+    }
+
+    async function rejectCandidate(email) {
+
+        fetch("../../Backend/project/reject_candidate.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS Candidatura (
     email_utente VARCHAR(255) NOT NULL,
     nome_progetto VARCHAR(255) NOT NULL,
     nome_profilo VARCHAR(100) NOT NULL,
-    accettata BOOLEAN DEFAULT FALSE,
+    accettata BOOLEAN DEFAULT NULL,
     PRIMARY KEY (email_utente, nome_progetto, nome_profilo),
     FOREIGN KEY (email_utente) REFERENCES Utente(email) ON DELETE CASCADE,
     FOREIGN KEY (nome_progetto) REFERENCES ProgettoSoftware(nome_progetto) ON DELETE CASCADE,
@@ -174,6 +174,7 @@ DROP PROCEDURE IF EXISTS GetSoftwareProjects;
 DROP PROCEDURE IF EXISTS GetHardwareProjects;
 DROP PROCEDURE IF EXISTS GetUserRewards;
 DROP PROCEDURE IF EXISTS GetUserApplications;
+DROP PROCEDURE IF EXISTS RifiutaCandidatura;
 
 DROP VIEW IF EXISTS View_user_features;
 DROP VIEW IF EXISTS View_general_project;
@@ -609,34 +610,51 @@ BEGIN
 END $$
 
 DELIMITER ;
+
 DELIMITER $$
 
--- Procedura per accettare la richiesta e aggiungere l'utente a Creatore
-CREATE PROCEDURE DiventaCreatore(IN email VARCHAR(255))
+CREATE PROCEDURE RifiutaCandidatura(
+    IN p_email_candidato VARCHAR(255),
+    IN p_nome_progetto VARCHAR(255),
+    IN p_nome_profilo VARCHAR(100),
+    IN p_email_corrente VARCHAR(255)
+)
 BEGIN
-    -- Controllo se l'utente ha fatto richiesta
-    IF EXISTS (SELECT 1 FROM Creatore_enrollement WHERE email_utente = email) THEN
-        -- Inserisce l'utente nella tabella Creatore
-        INSERT INTO Creatore (email, affidabilita) VALUES (email, 0);
-        
-        -- Rimuove la richiesta dalla tabella Creatore_enrollement
-        DELETE FROM Creatore_enrollement WHERE email_utente = email;
-    ELSE
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nessuna richiesta trovata per questa email';
-    END IF;
-END$$
+    DECLARE creatore_progetto VARCHAR(255);
+    DECLARE candidatura_esistente INT;
 
--- Procedura per rifiutare la richiesta di diventare creatore
-CREATE PROCEDURE RifiutaRichiestaCreatore(IN email VARCHAR(255))
-BEGIN
-    -- Controllo se la richiesta esiste
-    IF EXISTS (SELECT 1 FROM Creatore_enrollement WHERE email_utente = email) THEN
-        -- Cancella la richiesta
-        DELETE FROM Creatore_enrollement WHERE email_utente = email;
+    -- Recupera il creatore del progetto
+    SELECT email_creatore INTO creatore_progetto
+    FROM Progetto
+    WHERE nome = p_nome_progetto;
+
+    IF creatore_progetto IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Progetto non trovato.';
+    ELSEIF creatore_progetto != p_email_corrente THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Non autorizzato.';
     ELSE
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nessuna richiesta trovata per questa email';
+        -- Controlla se la candidatura esiste
+        SELECT COUNT(*) INTO candidatura_esistente
+        FROM Candidatura
+        WHERE email_utente = p_email_candidato
+          AND nome_progetto = p_nome_progetto
+          AND nome_profilo = p_nome_profilo;
+
+        IF candidatura_esistente = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Candidatura non trovata.';
+        ELSE
+            -- Aggiorna la candidatura come rifiutata
+            UPDATE Candidatura
+            SET accettata = FALSE
+            WHERE email_utente = p_email_candidato
+              AND nome_progetto = p_nome_progetto
+              AND nome_profilo = p_nome_profilo;
+        END IF;
     END IF;
-END$$
+END $$
 
 DELIMITER ;
 
