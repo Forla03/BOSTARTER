@@ -7,7 +7,7 @@ $is_creator = $_SESSION['is_creator'];
 
 if ($is_creator) {
     // Recupera i dati aggiuntivi del creator
-    $sql = "SELECT nr_progetti, affidabilita FROM Creatore WHERE email_utente = :email";
+    $sql = "SELECT affidabilita FROM Creatore WHERE email_utente = :email";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":email", $email);
     $stmt->execute();
@@ -17,7 +17,6 @@ if ($is_creator) {
         // Se l'utente è un creatore, restituisci i suoi dati
         $response = [
             'status' => 'creator',
-            'nr_progetti' => $creatorData['nr_progetti'],
             'affidabilita' => $creatorData['affidabilita']
         ];
     } else {

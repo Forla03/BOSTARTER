@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Get information from applicants table
         $stmt = $conn->prepare(" SELECT C.*
             FROM Candidatura C
-            WHERE C.nome_progetto = :nome_progetto AND  nome_profilo = :nome_profilo AND C.accettata = false");
+            WHERE C.nome_progetto = :nome_progetto AND  nome_profilo = :nome_profilo AND C.accettata IS NULL");
         $stmt->bindParam(':nome_progetto', $nome_progetto, PDO::PARAM_STR);
         $stmt->bindParam(':nome_profilo', $nome_profilo, PDO::PARAM_STR);
         $stmt->execute();
