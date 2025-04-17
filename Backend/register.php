@@ -21,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     try {
+        $conn->beginTransaction();
         //Insert into the Utente table
         $stmt = $conn->prepare("INSERT INTO Utente (email, nickname, password, nome, cognome, anno_nascita, luogo_nascita) 
                                 VALUES (:email, :nickname, :password, :nome, :cognome, :anno_nascita, :luogo_nascita)");
@@ -53,6 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             saveLog($mongoDb, "New admin registered: $email", "Registration");
         }
+
+        $conn->commit();
 
         // Redirect to login page
         header('Location: ../Frontend/login/login.html');

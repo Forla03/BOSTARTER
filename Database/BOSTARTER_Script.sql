@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS Progetto (
     nome VARCHAR(255) PRIMARY KEY,
     descrizione TEXT NOT NULL,
     data_inserimento DATE NOT NULL,
-    budget FLOAT NOT NULL,
+    budget DECIMAL(10,2) NOT NULL,
     data_limite DATE NOT NULL,
     stato ENUM('aperto', 'chiuso') NOT NULL DEFAULT 'aperto',
     email_creatore VARCHAR(255) NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS Reward (
 CREATE TABLE IF NOT EXISTS Finanziamento (
     email_utente VARCHAR(255) NOT NULL,
     nome_progetto VARCHAR(255) NOT NULL,
-    importo FLOAT NOT NULL,
+    importo DECIMAL(10,2) NOT NULL,
     data DATE NOT NULL,
     codice_reward INT NOT NULL,
     PRIMARY KEY (email_utente, nome_progetto, data),
@@ -190,16 +190,28 @@ AFTER INSERT ON Finanziamento
 FOR EACH ROW
 BEGIN
     DECLARE totale DECIMAL(10,2);
-
-    -- Calcola la somma totale dei finanziamenti per il progetto
+    DECLARE current_budget DECIMAL(10,2);
+    
+    START TRANSACTION; --Lock per impedire race condition
+    
+    SELECT budget INTO current_budget
+    FROM Progetto
+    WHERE nome = NEW.nome_progetto
+    FOR UPDATE;
+    
+    -- Calcola i fondi totali per il progetto
     SELECT SUM(importo) INTO totale
     FROM Finanziamento
     WHERE nome_progetto = NEW.nome_progetto;
-
-    -- Se il totale raggiunge o supera il budget, aggiorna lo stato del progettoamministratoreamministratore
-    UPDATE Progetto
-    SET stato = 'chiuso'
-    WHERE nome = NEW.nome_progetto AND totale >= budget;
+    
+    -- Aggiorna lo stato del progetto se il budget è raggiunto
+    IF totale >= current_budget THEN
+        UPDATE Progetto
+        SET stato = 'chiuso'
+        WHERE nome = NEW.nome_progetto;
+    END IF;
+    
+    COMMIT;
 END $$
 
 DELIMITER ;
@@ -216,6 +228,7 @@ BEGIN
     DECLARE numeratore INT DEFAULT 0;
     DECLARE denominatore INT DEFAULT 0;
 
+    START TRANSACTION;
     -- Calcola i progetti con almeno un finanziamento (numeratore)
     SELECT COUNT(DISTINCT P.nome)
     INTO numeratore
@@ -233,6 +246,7 @@ BEGIN
     UPDATE Creatore
     SET affidabilita = IF(denominatore = 0, 0, ROUND((numeratore / denominatore) * 100))
     WHERE email_utente = NEW.email_creatore;
+    COMMIT;
 END$$
 
 DELIMITER ;
@@ -247,6 +261,7 @@ BEGIN
     DECLARE numeratore INT DEFAULT 0;
     DECLARE denominatore INT DEFAULT 0;
 
+    START TRANSACTION;
     -- Trova l'email del creatore del progetto finanziato
     SELECT P.email_creatore INTO email_creatore
     FROM Progetto P
@@ -271,6 +286,7 @@ BEGIN
     UPDATE Creatore
     SET affidabilita = IF(denominatore = 0, 0, ROUND((numeratore / denominatore) * 100))
     WHERE email_utente = email_creatore;
+    COMMIT;
 END$$
 
 DELIMITER ;
@@ -368,6 +384,7 @@ CREATE PROCEDURE AggiungiProgettoHardware(
     IN p_email_creatore VARCHAR(255)
 )
 BEGIN
+    START TRANSACTION;
     -- Inserisce il progetto nella tabella Progetto
     INSERT INTO Progetto (nome, descrizione, data_inserimento, budget, data_limite, email_creatore)
     VALUES (p_nome, p_descrizione, p_data_inserimento, p_budget, p_data_limite, p_email_creatore);
@@ -375,6 +392,7 @@ BEGIN
     -- Inserisce il progetto nella tabella ProgettoHardware
     INSERT INTO ProgettoHardware (nome_progetto)
     VALUES (p_nome);
+    COMMIT;
 END $$
 
 CREATE PROCEDURE AggiungiProgettoSoftware(
@@ -386,6 +404,7 @@ CREATE PROCEDURE AggiungiProgettoSoftware(
     IN p_email_creatore VARCHAR(255)
 )
 BEGIN
+    START TRANSACTION;
     -- Inserisce il progetto nella tabella Progetto
     INSERT INTO Progetto (nome, descrizione, data_inserimento, budget, data_limite, email_creatore)
     VALUES (p_nome, p_descrizione, p_data_inserimento, p_budget, p_data_limite, p_email_creatore);
@@ -393,6 +412,7 @@ BEGIN
     -- Inserisce il progetto nella tabella ProgettoSoftware
     INSERT INTO ProgettoSoftware (nome_progetto)
     VALUES (p_nome);
+    COMMIT;
 END $$
 
 DELIMITER ;
