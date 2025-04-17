@@ -185,6 +185,8 @@ DROP VIEW IF EXISTS View_closed_projects;
 
 DELIMITER $$
 
+DELIMITER $$
+
 CREATE TRIGGER AggiornaStatoProgetto
 AFTER INSERT ON Finanziamento
 FOR EACH ROW
@@ -192,26 +194,20 @@ BEGIN
     DECLARE totale DECIMAL(10,2);
     DECLARE current_budget DECIMAL(10,2);
     
-    START TRANSACTION; --Lock per impedire race condition
-    
     SELECT budget INTO current_budget
     FROM Progetto
     WHERE nome = NEW.nome_progetto
     FOR UPDATE;
-    
-    -- Calcola i fondi totali per il progetto
+
     SELECT SUM(importo) INTO totale
     FROM Finanziamento
     WHERE nome_progetto = NEW.nome_progetto;
-    
-    -- Aggiorna lo stato del progetto se il budget è raggiunto
+
     IF totale >= current_budget THEN
         UPDATE Progetto
         SET stato = 'chiuso'
         WHERE nome = NEW.nome_progetto;
     END IF;
-    
-    COMMIT;
 END $$
 
 DELIMITER ;
@@ -224,32 +220,33 @@ CREATE TRIGGER AggiornaAffidabilitaDopoCreazioneProgetto
 AFTER INSERT ON Progetto
 FOR EACH ROW
 BEGIN
-
     DECLARE numeratore INT DEFAULT 0;
     DECLARE denominatore INT DEFAULT 0;
 
-    START TRANSACTION;
-    -- Calcola i progetti con almeno un finanziamento (numeratore)
+    SELECT affidabilita
+    INTO @dummy -- Usa una variabile temporanea per evitare conflitti
+    FROM Creatore
+    WHERE email_utente = NEW.email_creatore
+    FOR UPDATE;
+
     SELECT COUNT(DISTINCT P.nome)
     INTO numeratore
     FROM Progetto P
     JOIN Finanziamento F ON P.nome = F.nome_progetto
     WHERE P.email_creatore = NEW.email_creatore;
 
-    -- Calcola il numero totale di progetti del creatore (denominatore)
     SELECT COUNT(*)
     INTO denominatore
     FROM Progetto
     WHERE email_creatore = NEW.email_creatore;
 
-    -- Aggiorna l'affidabilità 
     UPDATE Creatore
     SET affidabilita = IF(denominatore = 0, 0, ROUND((numeratore / denominatore) * 100))
     WHERE email_utente = NEW.email_creatore;
-    COMMIT;
 END$$
 
 DELIMITER ;
+
 
 DELIMITER $$
 
@@ -260,12 +257,18 @@ BEGIN
     DECLARE email_creatore VARCHAR(255);
     DECLARE numeratore INT DEFAULT 0;
     DECLARE denominatore INT DEFAULT 0;
+    DECLARE dummy_affidabilita INT;
 
-    START TRANSACTION;
     -- Trova l'email del creatore del progetto finanziato
     SELECT P.email_creatore INTO email_creatore
     FROM Progetto P
     WHERE P.nome = NEW.nome_progetto;
+
+    -- Blocca la riga del creatore per aggiornamenti
+    SELECT affidabilita INTO dummy_affidabilita
+    FROM Creatore
+    WHERE email_utente = email_creatore
+    FOR UPDATE;
 
     -- Conta i progetti del creatore che hanno almeno un finanziamento
     SELECT COUNT(DISTINCT P.nome)
@@ -286,12 +289,9 @@ BEGIN
     UPDATE Creatore
     SET affidabilita = IF(denominatore = 0, 0, ROUND((numeratore / denominatore) * 100))
     WHERE email_utente = email_creatore;
-    COMMIT;
 END$$
 
 DELIMITER ;
-
-
 
 DELIMITER $$
 
@@ -384,7 +384,6 @@ CREATE PROCEDURE AggiungiProgettoHardware(
     IN p_email_creatore VARCHAR(255)
 )
 BEGIN
-    START TRANSACTION;
     -- Inserisce il progetto nella tabella Progetto
     INSERT INTO Progetto (nome, descrizione, data_inserimento, budget, data_limite, email_creatore)
     VALUES (p_nome, p_descrizione, p_data_inserimento, p_budget, p_data_limite, p_email_creatore);
@@ -392,7 +391,6 @@ BEGIN
     -- Inserisce il progetto nella tabella ProgettoHardware
     INSERT INTO ProgettoHardware (nome_progetto)
     VALUES (p_nome);
-    COMMIT;
 END $$
 
 CREATE PROCEDURE AggiungiProgettoSoftware(
@@ -404,7 +402,6 @@ CREATE PROCEDURE AggiungiProgettoSoftware(
     IN p_email_creatore VARCHAR(255)
 )
 BEGIN
-    START TRANSACTION;
     -- Inserisce il progetto nella tabella Progetto
     INSERT INTO Progetto (nome, descrizione, data_inserimento, budget, data_limite, email_creatore)
     VALUES (p_nome, p_descrizione, p_data_inserimento, p_budget, p_data_limite, p_email_creatore);
@@ -412,7 +409,6 @@ BEGIN
     -- Inserisce il progetto nella tabella ProgettoSoftware
     INSERT INTO ProgettoSoftware (nome_progetto)
     VALUES (p_nome);
-    COMMIT;
 END $$
 
 DELIMITER ;
@@ -431,7 +427,7 @@ CREATE PROCEDURE FinanziaProgetto(
 BEGIN
     DECLARE progetto_stato ENUM('aperto', 'chiuso');
 
-    -- Controlla se il progetto � aperto
+    -- Controlla se il progetto è aperto
     SELECT stato INTO progetto_stato FROM Progetto WHERE nome = p_nome_progetto;
 
     IF progetto_stato = 'aperto' THEN
