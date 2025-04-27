@@ -31,10 +31,10 @@
             <h2>Ricompense</h2>
 
             <label for="reward_description">Descrizione della ricompensa</label>
-            <input type="text" id="reward_description">
+            <input type="text" id="reward_description" >
 
             <label for="reward_pic">Immagine della ricompensa</label>
-            <input type="file" id="reward_pic" accept="image/*">
+            <input type="file" id="reward_pic" accept="image/*" >
 
             <button type="button" id="addReward-button">Aggiungi ricompensa</button>
         
@@ -128,7 +128,13 @@
         
        <button type="button" id="crea-progetto">Crea Progetto</button> 
     </form>
-
+    <div id="popupOverlay">
+        <div id="popupBox">
+        <p id="popupMessage">Messaggio di errore</p>
+        <button onclick="closePopup()">OK</button>
+        </div>
+    </div>
+   
     
 
 

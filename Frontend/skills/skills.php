@@ -22,7 +22,7 @@ if (!$conn) {
     <h1>Competenze di Programmazione</h1>
 </header>
 
-<a href="../../index.php">Home</a>
+<a href="../../index.php" class="link-btn">Home</a>
 
   
 <section class="skills-container">
@@ -84,7 +84,6 @@ function addSkill(skill, level) {
     .then(response => response.text())
     .then(data => {
         console.log("Risposta dal server:", data);
-        alert(data);
         setTimeout(() => location.reload(), 500);
     })
     .catch(error => console.error('Errore:', error));
@@ -97,7 +96,6 @@ function removeSkill(skill, level) {
     })
     .then(response => response.text())
     .then(data => {
-        alert(data);
         setTimeout(() => location.reload(), 500); // Aspetta mezzo secondo prima di ricaricare
     })
     .catch(error => console.error('Errore:', error));

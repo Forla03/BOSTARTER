@@ -84,6 +84,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     } catch (error) {
         console.error("Errore durante il caricamento dei progetti:", error);
-        alert("Si è verificato un errore durante il caricamento dei progetti. Riprova più tardi.");
+        showPopup("Si è verificato un errore durante il caricamento dei progetti. Riprova più tardi.");
     }
 });
+
+// Funzioni per il popup
+function showPopup(message) {
+    document.getElementById('popupMessage').innerText = message;
+    document.getElementById('popupOverlay').style.display = 'flex';
+}
+
+function closePopup() {
+    document.getElementById('popupOverlay').style.display = 'none';
+}
+

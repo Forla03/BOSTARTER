@@ -102,3 +102,25 @@ li {
     .add-skill-btn:hover {
         background: #0056b3;
     }
+
+/* Bottone generico per <a> */
+.link-btn {
+    margin-bottom: 20px;
+    display: inline-block;
+    background-color: #007bff; /* Blu acqua */
+    color: white;
+    padding: 10px 16px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.link-btn:hover {
+    background-color: #138496;
+}
+
+.link-btn:active {
+    transform: scale(0.95);
+}

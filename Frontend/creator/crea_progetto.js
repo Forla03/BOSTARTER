@@ -39,7 +39,7 @@ document.getElementById("addReward-button").addEventListener("click", function()
     const rewardPic = document.getElementById("reward_pic").files[0];
 
     if (!rewardDescription || !rewardPic) {
-        alert("Compila tutti i campi obbligatori per aggiungere una ricompensa.");
+        showPopup("Compila tutti i campi obbligatori per aggiungere una ricompensa.");
         return;
     }
 
@@ -166,7 +166,7 @@ const profili = new Map();
 document.getElementById("aggiungiProfilo").addEventListener("click", function() {
     const nomeProfilo = document.getElementById("nome_profilo").value.trim();
     if (!nomeProfilo || profili.has(nomeProfilo)) {
-        alert("Nome profilo già esistente o non valido.");
+        showPopup("Nome profilo già esistente o non valido.");
         return;
     }
     let selectedSkills = Array.from(document.querySelectorAll("#skillTableBody .skill-checkbox:checked")).map(checkbox => {
@@ -177,7 +177,7 @@ document.getElementById("aggiungiProfilo").addEventListener("click", function() 
     });
 
     if (selectedSkills.length === 0) {
-        alert("Seleziona almeno una skill per il profilo.");
+        showPopup("Seleziona almeno una skill per il profilo.");
         return;
     }
     
@@ -253,7 +253,7 @@ function postRewards(rewards, nome_progetto) {
 
 document.getElementById("crea-progetto").addEventListener("click", async function() {
     if (controllo == 0) {
-        alert("Seleziona la tipologia di progetto che vuoi creare");
+        showPopup("Seleziona la tipologia di progetto che vuoi creare");
     } else if (controllo == 1) {
         // Manage hardware project
         let form = document.getElementById("creaProgettoForm");
@@ -292,7 +292,7 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
             if (!data.success) {
                 // Specific error handling based on the message returned from the server
                 if (data.message.includes("The total cost of components")) {
-                    alert("Errore: Il costo totale dei componenti non corrisponde al budget specificato. Verifica i dati inseriti.");
+                    showPopup("Errore: Il costo totale dei componenti non corrisponde al budget specificato. Verifica i dati inseriti.");
                 } else {
                     throw new Error(data.message || "Errore sconosciuto");
                 }
@@ -309,7 +309,7 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
             }
         } catch (error) {
             console.error("Errore:", error);
-            alert("Errore durante la creazione del progetto: " + error.message);
+            showPopup(" Errore durante la creazione del progetto" );
         }
     } else {
         // Manage the software project
@@ -362,3 +362,13 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
     // Reset the selected skills table
     document.getElementById("selectedSkillTable").innerHTML = "";
 });
+
+// Funzioni per il popup
+function showPopup(message) {
+    document.getElementById('popupMessage').innerText = message;
+    document.getElementById('popupOverlay').style.display = 'flex';
+}
+
+function closePopup() {
+    document.getElementById('popupOverlay').style.display = 'none';
+}

@@ -187,7 +187,7 @@ function renderProjectData(data, projectType, profilesData, userEmail, projectIm
                 .then(response => response.json())
                 .then(result => {
                     if (result.success) {
-                        alert("Candidatura inviata con successo!");
+                        showPopup("Candidatura inviata con successo!");
                     } else {
                         const tooltip = document.createElement("div");
                         tooltip.classList.add("tooltip-bubble");
@@ -351,7 +351,7 @@ function renderProjectData(data, projectType, profilesData, userEmail, projectIm
                 displayError("Errore nell'invio del commento");
             });
         } else {
-            alert("Il commento non può essere vuoto.");
+            showPopup("Il commento non può essere vuoto.");
         }
     });
     commentsContainer.appendChild(commentForm);
@@ -412,7 +412,7 @@ function renderProjectData(data, projectType, profilesData, userEmail, projectIm
                     const replyText = form.querySelector(".reply-input").value.trim();
             
                     if (replyText === "") {
-                        alert("Il testo della risposta non può essere vuoto.");
+                        showPopup("Il testo della risposta non può essere vuoto.");
                         return;
                     }
             
@@ -446,11 +446,11 @@ function renderProjectData(data, projectType, profilesData, userEmail, projectIm
                             // Add the reply after removing the form and button
                             commentElement.appendChild(replyElement);
                         } else {
-                            alert("Errore durante l'invio della risposta: " + result.error);
+                            showPopup("Errore durante l'invio della risposta: " + result.error);
                         }
                     } catch (error) {
                         console.error("Errore nella richiesta:", error);
-                        alert("Errore nella richiesta.");
+                        showPopup("Errore nella richiesta.");
                     }
                 });
             });
@@ -471,3 +471,13 @@ function displayError(message) {
     errorElement.textContent = message;
     container.appendChild(errorElement);
     }
+
+function showPopup(message) {
+    document.getElementById('popupMessage').innerText = message;
+    document.getElementById('popupOverlay').style.display = 'flex';
+}
+    
+function closePopup() {
+    document.getElementById('popupOverlay').style.display = 'none';
+}
+    

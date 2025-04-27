@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.success) {
                 loadCandidature(); // Reload tables without reloading the page
             } else {
-                alert(data.message || "Errore durante l'accettazione.");
+                showPopup("Errore durante l'accettazione.");
             }
         })
         .catch(err => {
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.success) {
                 loadCandidature(); // Reload tables without reloading the page
             } else {
-                alert(data.message || "Errore durante l'accettazione.");
+                showPopup( "Errore durante l'accettazione.");
             }
         })
         .catch(err => {
@@ -122,3 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadCandidature(); 
 });
+
+// Funzioni per il popup
+function showPopup(message) {
+    document.getElementById('popupMessage').innerText = message;
+    document.getElementById('popupOverlay').style.display = 'flex';
+}
+
+function closePopup() {
+    document.getElementById('popupOverlay').style.display = 'none';
+}

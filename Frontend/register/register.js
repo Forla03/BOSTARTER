@@ -4,7 +4,7 @@ document.getElementById("registerForm").addEventListener("submit", function (eve
     let adminCheckbox = document.getElementById("admin");
 
     if (password !== confirmPassword) {
-        alert("Le password non coincidono!");
+        showPopup("Le password non coincidono!");
         event.preventDefault(); 
         return;
     }
@@ -13,14 +13,14 @@ document.getElementById("registerForm").addEventListener("submit", function (eve
         let adminCode = document.querySelector("input[name='adminCode']");  
         let adminCodePattern = /^\d{5}$/;
         if (!adminCode || !adminCodePattern.test(adminCode.value)) {
-            alert("Il codice admin deve essere di 5 cifre!");
+            showPopup("Il codice admin deve essere di 5 cifre!");
             event.preventDefault(); 
             return;
         }
 
     }
 
-    alert("Registrazione completata con successo!");
+    showPopup("Registrazione completata con successo!");
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -52,3 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+// Funzioni per il popup
+function showPopup(message) {
+    document.getElementById('popupMessage').innerText = message;
+    document.getElementById('popupOverlay').style.display = 'flex';
+}
+
+function closePopup() {
+    document.getElementById('popupOverlay').style.display = 'none';
+}

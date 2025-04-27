@@ -8,16 +8,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let donateButton = document.getElementById("donate-button");
     let donationAmount = document.getElementById("donation-amount");
 
-    donateButton.addEventListener("click", function(){
+    donateButton.addEventListener("click", function(event) {
         event.preventDefault();
+        
         let amount = donationAmount.value;
+        
         if (amount <= 0) {
-            alert("L'importo deve essere maggiore di zero.");
+            showPopup("L'importo deve essere maggiore di zero.");
             return;
         }
+    
+        // Controlla se una ricompensa è selezionata
         let selectedReward = document.querySelector(".reward-card.selected");
-        let rewardId = selectedReward ? selectedReward.getAttribute("data-id") : null;
-        // Call the backend to handle the donation
+        if (!selectedReward) {
+            showPopup("Devi selezionare una ricompensa per procedere con la donazione.");
+            return;
+        }
+        
+        let rewardId = selectedReward.getAttribute("data-id");
+    
+        // Chiamata al backend per gestire la donazione
         fetch("../../Backend/project/donate.php", {
             method: "POST",
             headers: {
@@ -28,16 +38,17 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("Donazione effettuata con successo!");
+                showPopup("Donazione effettuata con successo!");
             } else {
-                alert("Puoi donare ad un progetto solo una volta al giorno. Riprova domani.");
+                showPopup("Puoi donare a questo progetto solo una volta al giorno. Riprova domani.");
             }
         })
         .catch(error => {
             console.error("Errore nella richiesta:", error);
-            alert("Errore nella donazione. Riprova più tardi.");
+            showPopup("Errore nella donazione. Riprova più tardi.");
         });
     });
+    
 
     rewardUrl = "../../Backend/project/get_rewards.php";
     fetch(rewardUrl, {
@@ -93,7 +104,18 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Errore nella richiesta delle ricompense:", error);
     });
 
-
+ 
     
    
 });
+
+       // Funzioni per il popup
+       function showPopup(message) {
+        document.getElementById('popupMessage').innerText = message;
+        document.getElementById('popupOverlay').style.display = 'flex';
+    }
+
+    function closePopup() {
+        document.getElementById('popupOverlay').style.display = 'none';
+    }
+
