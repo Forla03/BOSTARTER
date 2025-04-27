@@ -1,28 +1,25 @@
-document.getElementById("registerForm").addEventListener("submit", function (event) {
-    let password = document.getElementById("password").value;
-    let confirmPassword = document.getElementById("confirmPassword").value;
-    let adminCheckbox = document.getElementById("admin");
+document.getElementById("registerForm").addEventListener("submit", async function (event) {
+    event.preventDefault(); 
+    let formData = new FormData(document.getElementById("registerForm"));
+    let responseMessage = ""; 
+    try {
+        let response = await fetch("/Backend/register.php", {
+            method: "POST",
+            body: formData,
+        });
 
-    if (password !== confirmPassword) {
-        showPopup("Le password non coincidono!");
-        event.preventDefault(); 
-        return;
-    }
-
-    if(adminCheckbox.checked) {
-        let adminCode = document.querySelector("input[name='adminCode']");  
-        let adminCodePattern = /^\d{5}$/;
-        if (!adminCode || !adminCodePattern.test(adminCode.value)) {
-            showPopup("Il codice admin deve essere di 5 cifre!");
-            event.preventDefault(); 
-            return;
+        let result = await response.json();
+        responseMessage = result.message; 
+        if (result.success) {
+            showPopup(responseMessage);
+        } else {
+            showPopup(responseMessage);
         }
-
+    } catch (error) {
+        responseMessage = "Errore durante la registrazione. Riprova più tardi.";
+        showPopup(responseMessage);
     }
-
-    showPopup("Registrazione completata con successo!");
 });
-
 document.addEventListener("DOMContentLoaded", function () {
     let adminCheckbox = document.getElementById("admin");
     adminCheckbox.addEventListener("change", function () {

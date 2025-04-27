@@ -251,25 +251,25 @@ function postRewards(rewards, nome_progetto) {
     })
 }
 
-document.getElementById("crea-progetto").addEventListener("click", async function() {
+document.getElementById("crea-progetto").addEventListener("click", async function () {
     if (controllo == 0) {
         showPopup("Seleziona la tipologia di progetto che vuoi creare");
     } else if (controllo == 1) {
         // Manage hardware project
         let form = document.getElementById("creaProgettoForm");
         const formData = new FormData();
-    
+
         formData.append('nome', form.querySelector('#nome').value);
         formData.append('descrizione', form.querySelector('#descrizione').value);
         formData.append('budget', form.querySelector('#budget').value);
         formData.append('data_inserimento', form.querySelector('#data_inserimento').value);
         formData.append('data_limite', form.querySelector('#data_limite').value);
-    
+
         const fileInput = form.querySelector('#immagini');
         for (let i = 0; i < fileInput.files.length; i++) {
             formData.append('immagini[]', fileInput.files[i]);
         }
-    
+
         const componenti = [];
         document.querySelectorAll(".componente").forEach(componenteDiv => {
             componenti.push({
@@ -279,19 +279,21 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
                 quantita: parseInt(componenteDiv.querySelector("p:nth-child(4)").textContent.replace("Quantità: ", "").trim(), 10)
             });
         });
-        formData.append('componenti', JSON.stringify(componenti));    
-        
+        formData.append('componenti', JSON.stringify(componenti));
+
         try {
             const response = await fetch("../../Backend/create_project_hardware.php", {
                 method: "POST",
-                body: formData 
+                body: formData
             });
 
             const data = await response.json();
 
             if (!data.success) {
-                // Specific error handling based on the message returned from the server
-                if (data.message.includes("The total cost of components")) {
+                // Specific error handling for duplicate key
+                if (data.message.includes("Duplicate entry")) {
+                    showPopup("Errore: Esiste già un progetto con lo stesso nome. Scegli un nome diverso.");
+                } else if (data.message.includes("The total cost of components")) {
                     showPopup("Errore: Il costo totale dei componenti non corrisponde al budget specificato. Verifica i dati inseriti.");
                 } else {
                     throw new Error(data.message || "Errore sconosciuto");
@@ -309,19 +311,19 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
             }
         } catch (error) {
             console.error("Errore:", error);
-            showPopup(" Errore durante la creazione del progetto" );
+            showPopup("Errore durante la creazione del progetto.");
         }
     } else {
         // Manage the software project
         let form = document.getElementById("creaProgettoForm");
         const formData = new FormData();
-    
+
         formData.append('nome', form.querySelector('#nome').value);
         formData.append('descrizione', form.querySelector('#descrizione').value);
         formData.append('budget', form.querySelector('#budget').value);
         formData.append('data_inserimento', form.querySelector('#data_inserimento').value);
         formData.append('data_limite', form.querySelector('#data_limite').value);
-    
+
         const fileInput = form.querySelector('#immagini');
         for (let i = 0; i < fileInput.files.length; i++) {
             formData.append('immagini[]', fileInput.files[i]);
@@ -340,11 +342,17 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
                 body: formData
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
             const data = await response.json();
+
+            if (!data.success) {
+                // Specific error handling for duplicate key
+                if (data.message.includes("Duplicate entry")) {
+                    showPopup("Errore: Esiste già un progetto con lo stesso nome. Scegli un nome diverso.");
+                } else {
+                    throw new Error(data.message || "Errore sconosciuto");
+                }
+                return;
+            }
 
             const rewardResponse = await postRewards(getRewards(), form.querySelector('#nome').value);
 
@@ -356,6 +364,7 @@ document.getElementById("crea-progetto").addEventListener("click", async functio
             }
         } catch (error) {
             console.error("Errore:", error);
+            showPopup("Errore durante la creazione del progetto.");
         }
     }
 

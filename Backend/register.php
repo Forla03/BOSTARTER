@@ -15,14 +15,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $isAdmin = isset($_POST["admin"]) ? 1 : 0;
     $adminCode = $_POST["adminCode"] ?? null; // Get the admin code if provided
     if ($password !== $confirmPassword) {
-        die("Le password non coincidono.");
+        echo json_encode(["success" => false, "message" => "Le password non coincidono."]);
+        exit();
     }
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     try {
         $conn->beginTransaction();
-        //Insert into the Utente table
+        // Insert into the Utente table
         $stmt = $conn->prepare("INSERT INTO Utente (email, nickname, password, nome, cognome, anno_nascita, luogo_nascita) 
                                 VALUES (:email, :nickname, :password, :nome, :cognome, :anno_nascita, :luogo_nascita)");
         $stmt->bindParam(":email", $email);
@@ -57,11 +58,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $conn->commit();
 
-        // Redirect to login page
-        header('Location: ../Frontend/login/login.html');
+        echo json_encode(["success" => true, "message" => "Registrazione completata con successo."]);
         exit();
     } catch (PDOException $e) {
-        echo "Errore nella registrazione: " . $e->getMessage();
+        if ($e->getCode() == 23000) { // Duplicate entry error code for MySQL
+            if (strpos($e->getMessage(), 'email') !== false) {
+                echo json_encode(["success" => false, "message" => "L'email è già registrata."]);
+            } elseif (strpos($e->getMessage(), 'nickname') !== false) {
+                echo json_encode(["success" => false, "message" => "Il nickname è già registrato."]);
+            } else {
+                echo json_encode(["success" => false, "message" => "L'email o il nickname sono già registrati."]);
+            }
+        } else {
+            echo json_encode(["success" => false, "message" => "Errore nella registrazione: " . $e->getMessage()]);
+        }
+        exit();
     }
 }
 ?>
