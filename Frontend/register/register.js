@@ -12,6 +12,10 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         responseMessage = result.message; 
         if (result.success) {
             showPopup(responseMessage);
+            closePopup = function () {
+                document.getElementById('popupOverlay').style.display = 'none';
+                window.location.href = "../login/login.html"; // Redirect to login page
+            };
         } else {
             showPopup(responseMessage);
         }
